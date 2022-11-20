@@ -1,0 +1,6 @@
+rootProject.name = 'manga'
+
+include 'api'
+include 'core'
+include('core:jcstress')
+include('core:jmh')

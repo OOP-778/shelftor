@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id 'checkstyle'
+}
+
+group 'net.manga'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+allprojects {
+    apply {
+        plugin("java")
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compileOnly(libs.lombok)
+    }
+}
