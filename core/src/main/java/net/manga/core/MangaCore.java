@@ -4,6 +4,7 @@ import net.manga.api.Manga;
 import net.manga.api.builder.StoreBuilder;
 import net.manga.api.query.Query;
 import net.manga.core.query.QueryImpl;
+import net.manga.core.store.CoreMangaStoreBuilder;
 
 public class MangaCore extends Manga {
 

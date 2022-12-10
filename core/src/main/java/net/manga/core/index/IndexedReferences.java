@@ -1,0 +1,40 @@
+package net.manga.core.index;
+
+import net.manga.api.index.IndexDefinition;
+import net.manga.api.reference.ReferenceManager;
+import net.manga.api.reference.ValueReference;
+import net.manga.core.store.MangaStoreSettings;
+import net.manga.core.util.collection.Collections;
+import net.manga.core.util.collection.ReferencedCollection;
+
+public class IndexedReferences<K, V> {
+    private final K key;
+    private final IndexDefinition<K, V> definition;
+    private final ReferencedCollection<V> collection;
+
+    public IndexedReferences(MangaStoreSettings storeSettings, ReferenceManager<V> referenceManager, K key, IndexDefinition<K, V> definition) {
+        this.key = key;
+        this.definition = definition;
+        this.collection = this.createCollection(storeSettings, referenceManager);
+    }
+
+    private ReferencedCollection<V> createCollection(MangaStoreSettings storeSettings, ReferenceManager<V> referenceManager) {
+        return Collections.createReferencedCollection(
+            storeSettings,
+            referenceManager
+        );
+    }
+
+    public boolean add(ValueReference<V> reference) {
+        this.collection.addReference(reference);
+        if (this.definition.getReducer() != null) {
+            this.definition.getReducer().reduce(this.key, this.collection);
+        }
+
+        return this.collection.contains(reference.get());
+    }
+
+    public void remove(ValueReference<V> reference) {
+        this.collection.addReference(reference);
+    }
+}

@@ -17,9 +17,15 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven {setUrl("https://repo.codemc.io/repository/maven-public/")}
     }
 
     dependencies {
         compileOnly(libs.lombok)
+        compileOnly(libs.jetbrainsAnnotations)
+        annotationProcessor(libs.lombok)
+
+        testImplementation(libs.lombok)
+        testAnnotationProcessor(libs.lombok)
     }
 }

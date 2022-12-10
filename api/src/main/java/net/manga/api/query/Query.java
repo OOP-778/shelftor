@@ -9,6 +9,10 @@ public interface Query {
         return Manga.get().createQuery();
     }
 
+    static Query where(@NonNull String index, @NonNull Object value) {
+        return create().and(index, value);
+    }
+
     Query or(@NonNull Query query);
 
     Query and(@NonNull Query query);
