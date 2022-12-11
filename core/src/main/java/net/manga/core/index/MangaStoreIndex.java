@@ -3,7 +3,6 @@ package net.manga.core.index;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,20 +12,22 @@ import net.manga.api.index.StoreIndex;
 import net.manga.api.index.comparison.ComparisonPolicy;
 import net.manga.api.reference.ReferenceManager;
 import net.manga.api.reference.ValueReference;
+import net.manga.core.query.QueryImpl;
 import net.manga.core.store.MangaCoreStore;
 import net.manga.core.store.MangaStoreSettings;
 import net.manga.core.util.OptionalLocking;
 import net.manga.core.util.collection.Collections;
 import net.manga.core.util.collection.ReferencedMap;
+import org.jetbrains.annotations.Unmodifiable;
 
 @SuppressWarnings("unchecked")
-public class MangaStoreIndex<T, K> implements StoreIndex<T> {
+public class MangaStoreIndex<T, K> implements StoreIndex<T, K> {
     private final String name;
     private final IndexDefinition<K, T> definition;
     private final ReferenceManager<T> referenceManager;
     private final MangaStoreSettings settings;
 
-    private final Map<K, IndexedReferences<K, T>> referencesMap;
+    private final Map<K, IndexedReferences<K, T>> keyToReferences;
     private final ReferencedMap<T, Collection<K>> referenceToKeys;
     private final Map<ValueReference<T>, OptionalLocking> locks;
 
@@ -35,7 +36,7 @@ public class MangaStoreIndex<T, K> implements StoreIndex<T> {
         this.definition = indexDefinition;
         this.referenceManager = store.getReferenceManager();
         this.settings = store.getSettings();
-        this.referencesMap = this.settings.isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
+        this.keyToReferences = this.settings.isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
         this.locks = this.settings.isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
         this.referenceToKeys = Collections.createReferencedMap(store.getSettings(), this.referenceManager);
         this.referenceManager.onReferenceRemove(this::removeReference);
@@ -66,7 +67,7 @@ public class MangaStoreIndex<T, K> implements StoreIndex<T> {
                 final Iterator<K> iterator = mapped.iterator();
                 while (iterator.hasNext()) {
                     final K key = iterator.next();
-                    final boolean addedToIndex = this.referencesMap
+                    final boolean addedToIndex = this.keyToReferences
                         .computeIfAbsent(key, ($) -> new IndexedReferences<>(this.settings, this.referenceManager, key, this.definition))
                         .add(reference);
 
@@ -80,6 +81,22 @@ public class MangaStoreIndex<T, K> implements StoreIndex<T> {
                 this.locks.remove(reference);
             }
         });
+    }
+
+    @Override
+    public Optional<T> findFirst(K key) {
+        return Optional.empty();
+    }
+
+    @Override
+    @Unmodifiable
+    public Collection<T> get(K key) {
+        final IndexedReferences<K, T> indexedReferences = this.keyToReferences.get(key);
+        if (indexedReferences == null) {
+            return java.util.Collections.emptySet();
+        }
+
+        return indexedReferences.getCollection();
     }
 
     private Collection<K> comparableKeys(Collection<K> mapped) {
@@ -105,23 +122,13 @@ public class MangaStoreIndex<T, K> implements StoreIndex<T> {
         }
 
         for (final K key : keys) {
-            final IndexedReferences<K, T> indexedReferences = this.referencesMap.get(key);
+            final IndexedReferences<K, T> indexedReferences = this.keyToReferences.get(key);
             if (indexedReferences == null) {
                 continue;
             }
 
             indexedReferences.remove(reference);
         }
-    }
-
-    @Override
-    public Optional<T> findFirst(Object key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<T> get(Object key) {
-        return null;
     }
 
     @Override

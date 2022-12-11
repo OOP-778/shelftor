@@ -6,26 +6,26 @@ import net.manga.api.index.reducer.Reducer;
 import org.jetbrains.annotations.Nullable;
 
 public interface Indexable<T> {
-    <K> StoreIndex<T> index(@NonNull String indexName, @NonNull IndexDefinition<K, T> indexDefinition);
+    <K> StoreIndex<T, K> index(@NonNull String indexName, @NonNull IndexDefinition<K, T> indexDefinition);
 
-    default <K> StoreIndex<T> index(String indexName, KeyMapper<K, T> keyMapper) {
+    default <K> StoreIndex<T, K> index(String indexName, KeyMapper<K, T> keyMapper) {
         return this.index(indexName, IndexDefinition.withKeyMapping(keyMapper));
     }
 
-    default <K> StoreIndex<T> index(String indexName, KeyMapper<K, T> keyMapper, Reducer<K, T> reducer) {
+    default <K> StoreIndex<T, K> index(String indexName, KeyMapper<K, T> keyMapper, Reducer<K, T> reducer) {
         return this.index(indexName, IndexDefinition.withKeyMapping(keyMapper).withReducer(reducer));
     }
 
-    boolean removeIndex(StoreIndex<T> index);
+    boolean removeIndex(StoreIndex<T, ?> index);
 
     default boolean removeIndex(String indexName) {
         return this.findIndex(indexName).map(this::removeIndex).orElse(false);
     }
 
     @Nullable
-    StoreIndex<T> getIndex(@NonNull String index);
+    <K> StoreIndex<T, K> getIndex(@NonNull String index);
 
-    default Optional<StoreIndex<T>> findIndex(@NonNull String index) {
+    default <K> Optional<StoreIndex<T, K>> findIndex(@NonNull String index) {
         return Optional.ofNullable(this.getIndex(index));
     }
 }

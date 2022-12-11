@@ -1,5 +1,6 @@
 package net.manga.core.index;
 
+import java.util.Collection;
 import net.manga.api.index.IndexDefinition;
 import net.manga.api.reference.ReferenceManager;
 import net.manga.api.reference.ValueReference;
@@ -36,5 +37,9 @@ public class IndexedReferences<K, V> {
 
     public void remove(ValueReference<V> reference) {
         this.collection.addReference(reference);
+    }
+
+    public Collection<V> getCollection() {
+        return java.util.Collections.unmodifiableCollection(this.collection);
     }
 }

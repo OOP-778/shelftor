@@ -17,11 +17,7 @@ public interface Query {
 
     Query and(@NonNull Query query);
 
-    default Query or(@NonNull String index, @NonNull Object value) {
-        return this.or(create().or(index, value));
-    }
+    Query or(@NonNull String index, @NonNull Object value);
 
-    default Query and(@NonNull String index, @NonNull Object value) {
-        return this.or(create().and(index, value));
-    }
+    Query and(@NonNull String index, @NonNull Object value);
 }

@@ -5,7 +5,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public interface ReferenceManager<T> {
-    ValueReference<T> createReference(@NonNull T value);
+    ValueReference<T> getOrCreateReference(@NonNull T value);
 
     void releaseReference(@NonNull ValueReference<T> reference);
 
@@ -15,4 +15,6 @@ public interface ReferenceManager<T> {
     ValueReference<T> createFetchingReference(@NotNull T value);
 
     Runnable onReferenceRemove(Consumer<ValueReference<T>> referenceConsumer);
+
+    Runnable onReferenceCreated(Consumer<ValueReference<T>> referenceConsumer);
 }

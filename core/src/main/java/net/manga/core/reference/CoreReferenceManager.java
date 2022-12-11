@@ -22,6 +22,7 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
     private final ReferenceQueue<T> referenceQueue;
     private final Map<Integer, ValueReference<T>> referenceMap;
     private final Collection<Consumer<ValueReference<T>>> removeListeners;
+    private final Collection<Consumer<ValueReference<T>>> addListeners;
 
     public CoreReferenceManager(MangaCoreStore<T> store) {
         this.settings = store.getSettings();
@@ -29,11 +30,21 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
         this.referenceQueue = this.settings.isWeakKeys() ? new ReferenceQueue<>() : null;
         this.referenceMap = this.settings.isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
         this.removeListeners = this.settings.isConcurrent() ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
+        this.addListeners = this.settings.isConcurrent() ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
     }
 
     @Override
-    public ValueReference<T> createReference(@NotNull T value) {
-        return this.referenceFactory.apply(value);
+    public ValueReference<T> getOrCreateReference(@NotNull T value) {
+        return this.referenceMap.computeIfAbsent(this.hash(value), ($) -> this.announce(this.referenceFactory.apply(value)));
+    }
+
+    private ValueReference<T> announce(ValueReference<T> apply) {
+        this.addListeners.forEach((listener) -> listener.accept(apply));
+        return apply;
+    }
+
+    private int hash(T value) {
+        return this.settings.isHashable() ? value.hashCode() : System.identityHashCode(value);
     }
 
     @Override
@@ -56,10 +67,6 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
         };
     }
 
-    public Function<T, ValueReference<T>> getReferenceFactory() {
-        return this.referenceFactory;
-    }
-
     public ValueReference<T> add(T value) {
         return this.referenceFactory.apply(value);
     }
@@ -68,6 +75,12 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
     public Runnable onReferenceRemove(Consumer<ValueReference<T>> referenceConsumer) {
         this.removeListeners.add(referenceConsumer);
         return () -> this.removeListeners.remove(referenceConsumer);
+    }
+
+    @Override
+    public Runnable onReferenceCreated(Consumer<ValueReference<T>> referenceConsumer) {
+        this.addListeners.add(referenceConsumer);
+        return () -> this.addListeners.remove(referenceConsumer);
     }
 
     public void runRemoveQueue() {

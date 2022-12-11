@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import net.manga.api.reference.ValueReference;
 
 public class MultiReducer<K, V> implements Reducer<K, V> {
     private final List<Reducer<K, V>> reducers;
@@ -15,12 +15,12 @@ public class MultiReducer<K, V> implements Reducer<K, V> {
     }
 
     @Override
-    public void reduce(final K key, final Collection<ValueReference<V>> elements) {
+    public void reduce(final K key, final Collection<V> elements) {
         for (final Reducer<K, V> reducer : this.reducers) {
             reducer.reduce(
                 key,
                 elements.stream()
-                    .filter(element -> element.get() != null)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList())
             );
         }

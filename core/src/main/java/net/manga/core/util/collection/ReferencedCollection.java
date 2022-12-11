@@ -5,18 +5,19 @@ import java.util.Iterator;
 import java.util.Objects;
 import net.manga.api.reference.ReferenceManager;
 import net.manga.api.reference.ValueReference;
+import net.manga.core.reference.CoreReferenceManager;
 import org.jetbrains.annotations.NotNull;
 
 public class ReferencedCollection<T> implements Collection<T> {
     private final Collection<ValueReference<T>> backing;
-    private final ReferenceManager<T> referenceManager;
+    private final CoreReferenceManager<T> referenceManager;
 
     public ReferencedCollection(
         Collection<ValueReference<T>> backing,
         ReferenceManager<T> referenceManager
     ) {
         this.backing = backing;
-        this.referenceManager = referenceManager;
+        this.referenceManager = (CoreReferenceManager<T>) referenceManager;
         this.referenceManager.onReferenceRemove(this.backing::remove);
     }
 
@@ -30,22 +31,26 @@ public class ReferencedCollection<T> implements Collection<T> {
 
     @Override
     public int size() {
+        this.referenceManager.runRemoveQueue();
         return this.backing.size();
     }
 
     @Override
     public boolean isEmpty() {
+        this.referenceManager.runRemoveQueue();
         return this.backing.isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
+        this.referenceManager.runRemoveQueue();
         return this.backing.contains(this.referenceManager.createFetchingReference((T) o));
     }
 
     @NotNull
     @Override
     public Iterator<T> iterator() {
+        this.referenceManager.runRemoveQueue();
         return new ReferencedIterator<T, ValueReference<T>>(this.backing.iterator()) {
             @Override
             protected T extractKey(ValueReference<T> reference) {
@@ -57,6 +62,7 @@ public class ReferencedCollection<T> implements Collection<T> {
     @NotNull
     @Override
     public Object[] toArray() {
+        this.referenceManager.runRemoveQueue();
         return this.backing.stream()
             .map(ValueReference::get)
             .filter(Objects::nonNull)
@@ -66,6 +72,7 @@ public class ReferencedCollection<T> implements Collection<T> {
     @NotNull
     @Override
     public <T1> T1[] toArray(@NotNull T1[] a) {
+        this.referenceManager.runRemoveQueue();
         return this.backing.stream()
             .map(ValueReference::get)
             .filter(Objects::nonNull)
@@ -74,7 +81,9 @@ public class ReferencedCollection<T> implements Collection<T> {
 
     @Override
     public boolean add(T t) {
-        final ValueReference<T> reference = this.referenceManager.createReference(t);
+        this.referenceManager.runRemoveQueue();
+
+        final ValueReference<T> reference = this.referenceManager.getOrCreateReference(t);
         final boolean add = this.backing.add(reference);
 
         if (!add) {
@@ -86,6 +95,7 @@ public class ReferencedCollection<T> implements Collection<T> {
 
     @Override
     public boolean remove(Object o) {
+        this.referenceManager.runRemoveQueue();
         final ValueReference<T> reference = this.referenceManager.createFetchingReference((T) o);
         return this.backing.remove(reference);
     }

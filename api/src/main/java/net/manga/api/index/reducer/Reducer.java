@@ -2,7 +2,6 @@ package net.manga.api.index.reducer;
 
 import java.util.Arrays;
 import java.util.Collection;
-import net.manga.api.reference.ValueReference;
 
 @FunctionalInterface
 public interface Reducer<K, V> {

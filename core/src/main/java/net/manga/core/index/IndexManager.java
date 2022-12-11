@@ -17,10 +17,11 @@ public class IndexManager<T> implements Indexable<T> {
     public IndexManager(MangaCoreStore<T> store) {
         this.store = store;
         this.indexes = store.getSettings().isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
+        store.getReferenceManager().onReferenceCreated((reference) -> this.indexes.values().forEach((index) -> index.index(reference)));
     }
 
     @Override
-    public <K> StoreIndex<T> index(@NonNull String indexName, @NonNull IndexDefinition<K, T> indexDefinition) {
+    public <K> MangaStoreIndex<T, K> index(@NonNull String indexName, @NonNull IndexDefinition<K, T> indexDefinition) {
         final MangaStoreIndex<T, K> index = new MangaStoreIndex<>(this.store, indexName, indexDefinition);
         this.indexes.put(indexName, index);
 
@@ -28,13 +29,13 @@ public class IndexManager<T> implements Indexable<T> {
     }
 
     @Override
-    public boolean removeIndex(StoreIndex<T> index) {
+    public boolean removeIndex(StoreIndex<T, ?> index) {
         return this.indexes.remove(index.getName()) != null;
     }
 
     @Override
     @Nullable
-    public StoreIndex<T> getIndex(@NonNull String index) {
-        return this.indexes.get(index);
+    public <K> MangaStoreIndex<T, K> getIndex(@NonNull String index) {
+        return (MangaStoreIndex<T, K>) this.indexes.get(index);
     }
 }

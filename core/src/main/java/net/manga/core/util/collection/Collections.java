@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import net.manga.api.reference.ReferenceManager;
+import net.manga.core.reference.CoreReferenceManager;
 import net.manga.core.store.MangaStoreSettings;
 
 public class Collections {

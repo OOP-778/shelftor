@@ -3,8 +3,16 @@ plugins {
 }
 
 dependencies {
-    jcstressImplementation(rootProject)
+    jcstressImplementation(project(":api"))
+    jcstressImplementation(project(":core"))
+    jcstressAnnotationProcessor(libs.lombok)
     jcstress(libs.jcstress.core)
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 jcstress {

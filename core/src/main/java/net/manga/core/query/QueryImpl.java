@@ -61,9 +61,44 @@ public class QueryImpl implements Query {
 
     @Override
     public Query and(@NonNull Query query) {
+        if (!this.isInitialized()) {
+            final QueryImpl subQuery = (QueryImpl) query;
+            this.operator = subQuery.getOperator();
+            this.index = subQuery.getIndex();
+            this.value = subQuery.getValue();
+            this.queries = subQuery.getQueries();
+            return this;
+        }
+
         this.queries.add((QueryImpl) query);
         this.operator = Operator.AND;
 
+        return this;
+    }
+
+    @Override
+    public Query or(@NonNull String index, @NonNull Object value) {
+        if (this.isInitialized()) {
+            this.index = index;
+            this.value = value;
+            this.operator = Operator.OR;
+            return this;
+        }
+
+        this.queries.add(new QueryImpl(index, value, Operator.OR));
+        return this;
+    }
+
+    @Override
+    public Query and(@NonNull String index, @NonNull Object value) {
+        if (this.isInitialized()) {
+            this.index = index;
+            this.value = value;
+            this.operator = Operator.AND;
+            return this;
+        }
+
+        this.queries.add(new QueryImpl(index, value, Operator.AND));
         return this;
     }
 
