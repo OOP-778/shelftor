@@ -1,6 +1,6 @@
 package net.manga.api;
 
-import net.manga.api.builder.StoreBuilder;
+import net.manga.api.store.StoreBuilder;
 import net.manga.api.query.Query;
 
 public abstract class Manga {

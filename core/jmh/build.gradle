@@ -10,3 +10,8 @@ dependencies {
     jmhAnnotationProcessor(libs.lombok)
     jmhImplementation("com.oop:memory-store:latest.integration")
 }
+
+jmh {
+    profilers = ["stack"]
+    synchronizeIterations = false
+}

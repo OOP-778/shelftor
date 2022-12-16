@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.manga.api.store.MangaStore;
+import net.manga.api.store.expiring.ExpiringMangaStore;
 import net.manga.core.MangaCore;
 
 public class Test {
@@ -12,9 +13,13 @@ public class Test {
     public static void main(String[] args) {
         new MangaCore();
 
-        final MangaStore<TestObject> build = MangaStore.<TestObject>builder()
-            .weakKeys()
+        final ExpiringMangaStore<TestObject> build = MangaStore.<TestObject>builder()
+            .weak()
+            .expiring()
+            .expireCheckInterval(10)
             .build();
+
+        build.invalidate();
 
         build.index("test", TestObject::getObjectA);
 

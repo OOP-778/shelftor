@@ -2,6 +2,7 @@ package net.manga.api.reference;
 
 import java.util.function.Consumer;
 import lombok.NonNull;
+import net.manga.api.util.Closeable;
 import org.jetbrains.annotations.NotNull;
 
 public interface ReferenceManager<T> {
@@ -14,7 +15,9 @@ public interface ReferenceManager<T> {
     // This is used just for fetching by keys, to not create a real java ref
     ValueReference<T> createFetchingReference(@NotNull T value);
 
-    Runnable onReferenceRemove(Consumer<ValueReference<T>> referenceConsumer);
+    Closeable onReferenceRemove(Consumer<ValueReference<T>> referenceConsumer);
 
-    Runnable onReferenceCreated(Consumer<ValueReference<T>> referenceConsumer);
+    Closeable onReferenceCreated(Consumer<ValueReference<T>> referenceConsumer);
+
+    Closeable onReferenceAccess(Consumer<ValueReference<T>> referenceConsumer);
 }

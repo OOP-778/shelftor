@@ -2,7 +2,6 @@ package net.manga.api.store;
 
 import java.util.Collection;
 import net.manga.api.Manga;
-import net.manga.api.builder.StoreBuilder;
 import net.manga.api.index.Indexable;
 import net.manga.api.query.Queryable;
 

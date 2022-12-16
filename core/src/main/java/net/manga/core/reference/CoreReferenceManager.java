@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import net.manga.api.reference.ReferenceManager;
 import net.manga.api.reference.ValueReference;
+import net.manga.api.util.Closeable;
 import net.manga.core.store.MangaCoreStore;
 import net.manga.core.store.MangaStoreSettings;
 import org.jetbrains.annotations.NotNull;
@@ -23,14 +24,16 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
     private final Map<Integer, ValueReference<T>> referenceMap;
     private final Collection<Consumer<ValueReference<T>>> removeListeners;
     private final Collection<Consumer<ValueReference<T>>> addListeners;
+    private final Collection<Consumer<ValueReference<T>>> accessListeners;
 
     public CoreReferenceManager(MangaCoreStore<T> store) {
         this.settings = store.getSettings();
         this.referenceFactory = this.createReferenceFactory();
-        this.referenceQueue = this.settings.isWeakKeys() ? new ReferenceQueue<>() : null;
+        this.referenceQueue = this.settings.isWeak() ? new ReferenceQueue<>() : null;
         this.referenceMap = this.settings.isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
         this.removeListeners = this.settings.isConcurrent() ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
         this.addListeners = this.settings.isConcurrent() ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
+        this.accessListeners = this.settings.isConcurrent() ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
     }
 
     @Override
@@ -59,7 +62,7 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
 
     private Function<T, ValueReference<T>> createReferenceFactory() {
         return (value) -> {
-            if (this.settings.isWeakKeys()) {
+            if (this.settings.isWeak()) {
                 return ValueReference.weak(value, !this.settings.isHashable(), this.referenceQueue);
             }
 
@@ -72,15 +75,21 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
     }
 
     @Override
-    public Runnable onReferenceRemove(Consumer<ValueReference<T>> referenceConsumer) {
+    public Closeable onReferenceRemove(Consumer<ValueReference<T>> referenceConsumer) {
         this.removeListeners.add(referenceConsumer);
         return () -> this.removeListeners.remove(referenceConsumer);
     }
 
     @Override
-    public Runnable onReferenceCreated(Consumer<ValueReference<T>> referenceConsumer) {
+    public Closeable onReferenceCreated(Consumer<ValueReference<T>> referenceConsumer) {
         this.addListeners.add(referenceConsumer);
         return () -> this.addListeners.remove(referenceConsumer);
+    }
+
+    @Override
+    public Closeable onReferenceAccess(Consumer<ValueReference<T>> referenceConsumer) {
+        this.accessListeners.add(referenceConsumer);
+        return () -> this.accessListeners.remove(referenceConsumer);
     }
 
     public void runRemoveQueue() {

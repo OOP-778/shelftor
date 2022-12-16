@@ -19,13 +19,13 @@ public class MangaCoreStore<T> extends ListenableCollection<T> implements MangaS
     private final CoreReferenceManager<T> referenceManager;
     private final IndexManager<T> indexManager;
 
-    public MangaCoreStore(CoreMangaStoreBuilder builder) {
+    public MangaCoreStore(MangaStoreSettings settings) {
         super(
             null,
-            builder.settings.isConcurrent()
+            settings.isConcurrent()
         );
 
-        this.settings = builder.settings;
+        this.settings = settings;
         this.referenceManager = new CoreReferenceManager<>(this);
         this.indexManager = new IndexManager<>(this);
 

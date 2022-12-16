@@ -5,6 +5,7 @@ import java.time.ZoneOffset;
 import net.manga.api.index.comparison.ComparisonPolicy;
 
 public class OffsetDateTimeComparisonPolicy implements ComparisonPolicy<OffsetDateTime> {
+
   @Override
   public boolean supports(final Class<?> clazz) {
     return clazz == OffsetDateTime.class;

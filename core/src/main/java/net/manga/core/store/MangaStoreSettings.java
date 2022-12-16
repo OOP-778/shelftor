@@ -7,11 +7,17 @@ import net.manga.api.store.StoreSettings;
 public class MangaStoreSettings implements StoreSettings {
     private boolean concurrent;
     private boolean hashable;
-    private boolean weakKeys;
+    private boolean weak;
 
     public MangaStoreSettings(boolean concurrent, boolean hashable) {
         this.concurrent = concurrent;
         this.hashable = hashable;
+    }
+
+    public MangaStoreSettings(StoreSettings settings) {
+        this.concurrent = settings.isConcurrent();
+        this.hashable = settings.isHashable();
+        this.weak = settings.isWeak();
     }
 
     @Override
@@ -25,8 +31,8 @@ public class MangaStoreSettings implements StoreSettings {
     }
 
     @Override
-    public boolean isWeakKeys() {
-        return this.weakKeys;
+    public boolean isWeak() {
+        return this.weak;
     }
 
     public void setConcurrent(boolean concurrent) {
@@ -37,8 +43,8 @@ public class MangaStoreSettings implements StoreSettings {
         this.hashable = hashable;
     }
 
-    public void setWeakKeys(boolean weakKeys) {
-        this.weakKeys = weakKeys;
+    public void setWeak(boolean weak) {
+        this.weak = weak;
     }
 
     public static MangaStoreSettings create() {

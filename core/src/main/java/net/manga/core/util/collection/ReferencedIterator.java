@@ -4,7 +4,7 @@ public abstract class ReferencedIterator<T, U> implements java.util.Iterator<T> 
     private final java.util.Iterator<U> backingIterator;
     protected T next;
 
-    public ReferencedIterator(java.util.Iterator<U> weakIterator) {
+    protected ReferencedIterator(java.util.Iterator<U> weakIterator) {
         this.backingIterator = weakIterator;
         this.advance();
     }

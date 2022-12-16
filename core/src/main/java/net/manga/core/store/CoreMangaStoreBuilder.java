@@ -1,11 +1,21 @@
 package net.manga.core.store;
 
-import net.manga.api.builder.ExpiringStoreBuilder;
-import net.manga.api.builder.StoreBuilder;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import net.manga.api.store.MangaStore;
+import net.manga.api.store.StoreBuilder;
+import net.manga.api.store.expiring.ExpiringStoreBuilder;
+import net.manga.core.store.expiring.CoreMangaExpiringStoreBuilder;
 
 public class CoreMangaStoreBuilder<T, B extends StoreBuilder<T, ?>> implements StoreBuilder<T, B> {
     protected MangaStoreSettings settings = MangaStoreSettings.create();
+
+    public CoreMangaStoreBuilder() {
+    }
+
+    public CoreMangaStoreBuilder(CoreMangaStoreBuilder<T, ?> from, UnaryOperator<MangaStoreSettings> settingsCreator) {
+        this.settings = settingsCreator.apply(from.settings);
+    }
 
     @Override
     public B hashable() {
@@ -14,8 +24,8 @@ public class CoreMangaStoreBuilder<T, B extends StoreBuilder<T, ?>> implements S
     }
 
     @Override
-    public B weakKeys() {
-        this.settings.setWeakKeys(true);
+    public B weak() {
+        this.settings.setWeak(true);
         return (B) this;
     }
 
@@ -27,11 +37,11 @@ public class CoreMangaStoreBuilder<T, B extends StoreBuilder<T, ?>> implements S
 
     @Override
     public ExpiringStoreBuilder<T, ?> expiring() {
-        return null;
+        return new CoreMangaExpiringStoreBuilder<>(this);
     }
 
     @Override
     public MangaStore<T> build() {
-        return new MangaCoreStore<>(this);
+        return new MangaCoreStore<>(this.settings);
     }
 }

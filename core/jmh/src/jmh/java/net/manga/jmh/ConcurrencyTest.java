@@ -2,6 +2,7 @@ package net.manga.jmh;
 
 
 import com.oop.memorystore.api.Store;
+import com.oop.memorystore.implementation.SynchronizedStore;
 import com.oop.memorystore.implementation.memory.MemoryStore;
 import com.oop.memorystore.implementation.query.Query;
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,8 +24,8 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
-@BenchmarkMode(Mode.Throughput)
-@OutputTimeUnit(TimeUnit.SECONDS)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Measurement(time = 1)
 @Warmup(time = 1, iterations = 1)
 @Threads(20)
@@ -53,41 +54,7 @@ public class ConcurrencyTest {
         new Thread(() -> {
             while (true) {
 
-                for (final TestObject testObject : mangaState.store) {
-                    if (ThreadLocalRandom.current().nextInt(0, 2) == 1) {
-                        mangaState.store.getIndex("test").index(mangaState.store.getReferenceManager().createFetchingReference(testObject));
-                    }
-                }
-
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }).start();
-
-        new Thread(() -> {
-            while (true) {
-
                 memoryState.store.get(Query.where("test", "test"));
-
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }).start();
-
-        new Thread(() -> {
-            while (true) {
-
-                for (final TestObject testObject : memoryState.store) {
-                    if ((ThreadLocalRandom.current().nextInt(0, 2) == 1)) {
-                        memoryState.store.reindex(testObject);
-                    }
-                }
 
                 try {
                     Thread.sleep(100);
@@ -132,12 +99,12 @@ public class ConcurrencyTest {
 
             this.store = MangaCoreStore.<TestObject>builder()
                 .concurrent()
+                .hashable()
                 .build();
 
             this.store.index("test", TestObject::getObjectA);
         }
     }
-
 
     public static class MemoryStoreState {
         private final Store<TestObject> store = new MemoryStore<TestObject>().synchronizedStore();

@@ -1,7 +1,7 @@
 package net.manga.core;
 
 import net.manga.api.Manga;
-import net.manga.api.builder.StoreBuilder;
+import net.manga.api.store.StoreBuilder;
 import net.manga.api.query.Query;
 import net.manga.core.query.QueryImpl;
 import net.manga.core.store.CoreMangaStoreBuilder;

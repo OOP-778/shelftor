@@ -1,5 +1,6 @@
 package net.manga.core.index;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,16 +13,16 @@ import net.manga.api.index.StoreIndex;
 import net.manga.api.index.comparison.ComparisonPolicy;
 import net.manga.api.reference.ReferenceManager;
 import net.manga.api.reference.ValueReference;
-import net.manga.core.query.QueryImpl;
 import net.manga.core.store.MangaCoreStore;
 import net.manga.core.store.MangaStoreSettings;
 import net.manga.core.util.OptionalLocking;
+import net.manga.core.util.closeable.CloseableHolder;
 import net.manga.core.util.collection.Collections;
 import net.manga.core.util.collection.ReferencedMap;
 import org.jetbrains.annotations.Unmodifiable;
 
 @SuppressWarnings("unchecked")
-public class MangaStoreIndex<T, K> implements StoreIndex<T, K> {
+public class MangaStoreIndex<T, K> extends CloseableHolder implements StoreIndex<T, K> {
     private final String name;
     private final IndexDefinition<K, T> definition;
     private final ReferenceManager<T> referenceManager;
@@ -39,7 +40,8 @@ public class MangaStoreIndex<T, K> implements StoreIndex<T, K> {
         this.keyToReferences = this.settings.isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
         this.locks = this.settings.isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
         this.referenceToKeys = Collections.createReferencedMap(store.getSettings(), this.referenceManager);
-        this.referenceManager.onReferenceRemove(this::removeReference);
+
+        this.addCloseable(this.referenceManager.onReferenceRemove(this::removeReference));
     }
 
     @Override
@@ -57,7 +59,7 @@ public class MangaStoreIndex<T, K> implements StoreIndex<T, K> {
                 }
 
                 final Collection<K> mapped = this.definition.getComparisonPolicy() == null
-                                             ? this.definition.getKeyMapper().map(value)
+                                             ? new ArrayList<>(this.definition.getKeyMapper().map(value))
                                              : this.comparableKeys(this.definition.getKeyMapper().map(value));
                 if (mapped.isEmpty()) {
                     this.removeReferenceWithoutLocking(reference);

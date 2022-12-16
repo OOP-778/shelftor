@@ -27,7 +27,11 @@ public class IndexedReferences<K, V> {
     }
 
     public boolean add(ValueReference<V> reference) {
-        this.collection.addReference(reference);
+        final boolean added = this.collection.addReference(reference);
+        if (!added) {
+            return false;
+        }
+
         if (this.definition.getReducer() != null) {
             this.definition.getReducer().reduce(this.key, this.collection);
         }
