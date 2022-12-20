@@ -1,16 +1,14 @@
 package net.manga.core.expiring;
 
-import java.util.Map;
-import net.manga.api.expiring.ExpirationData;
-import net.manga.api.expiring.ExpiringPolicy;
-import net.manga.api.expiring.ExpiringPolicyWithData;
+import net.manga.api.expiring.policy.ExpirationData;
+import net.manga.api.expiring.policy.ExpiringPolicy;
+import net.manga.api.expiring.policy.ExpiringPolicyWithData;
 import net.manga.core.reference.CoreReferenceManager;
 import net.manga.core.store.expiring.CoreMangaExpiringStore;
 import net.manga.core.store.expiring.CoreMangaExpiringStoreSettings;
 import net.manga.core.util.closeable.CloseableHolder;
 
 public class ExpirationManager<T> extends CloseableHolder {
-    private final Map<>
 
     public ExpirationManager(CoreMangaExpiringStore<T> store) {
         final CoreReferenceManager<T> referenceManager = store.getReferenceManager();
@@ -30,9 +28,6 @@ public class ExpirationManager<T> extends CloseableHolder {
 
                 final ExpiringPolicyWithData<T, ?> expiringPolicyWithData = (ExpiringPolicyWithData<T, ?>) expiringPolicy;
                 final ExpirationData expirationData = expiringPolicyWithData.createExpirationData(refValue);
-
-
-
             }
         }));
     }

@@ -2,7 +2,7 @@ package net.manga.core.store.expiring;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import net.manga.api.expiring.ExpiringPolicy;
+import net.manga.api.expiring.policy.ExpiringPolicy;
 import net.manga.api.store.expiring.ExpiringStoreSettings;
 import net.manga.core.store.MangaStoreSettings;
 

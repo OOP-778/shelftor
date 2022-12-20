@@ -1,6 +1,6 @@
 package net.manga.core.store.expiring;
 
-import net.manga.api.expiring.ExpiringPolicy;
+import net.manga.api.expiring.policy.ExpiringPolicy;
 import net.manga.api.store.expiring.ExpiringMangaStore;
 import net.manga.api.store.expiring.ExpiringStoreBuilder;
 import net.manga.core.store.CoreMangaStoreBuilder;

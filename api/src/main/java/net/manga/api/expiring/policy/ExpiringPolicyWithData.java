@@ -1,4 +1,4 @@
-package net.manga.api.expiring;
+package net.manga.api.expiring.policy;
 
 import lombok.NonNull;
 

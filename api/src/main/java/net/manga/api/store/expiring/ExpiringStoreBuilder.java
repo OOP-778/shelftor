@@ -1,7 +1,7 @@
 package net.manga.api.store.expiring;
 
 import java.util.concurrent.TimeUnit;
-import net.manga.api.expiring.ExpiringPolicy;
+import net.manga.api.expiring.policy.ExpiringPolicy;
 import net.manga.api.store.StoreBuilder;
 
 public interface ExpiringStoreBuilder<T, B extends ExpiringStoreBuilder<T, ?>> extends StoreBuilder<T, B> {
@@ -13,6 +13,8 @@ public interface ExpiringStoreBuilder<T, B extends ExpiringStoreBuilder<T, ?>> e
     }
 
     B usePolicy(ExpiringPolicy<T> policy);
+
+    B useExpirationCheck();
 
     @Override
     default ExpiringStoreBuilder<T, ?> expiring() {
