@@ -6,17 +6,17 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import net.manga.api.reference.ReferenceManager;
-import net.manga.api.reference.ValueReference;
+import net.manga.api.reference.EntryReference;
 import net.manga.core.reference.CoreReferenceManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ReferencedMap<K, V> implements Map<K, V> {
-    private final Map<ValueReference<K>, V> map;
+    private final Map<EntryReference<K>, V> map;
     private final CoreReferenceManager<K> referenceManager;
 
     public ReferencedMap(
-        Map<ValueReference<K>, V> map,
+        Map<EntryReference<K>, V> map,
         ReferenceManager<K> referenceManager
     ) {
         this.map = map;
@@ -24,11 +24,11 @@ public class ReferencedMap<K, V> implements Map<K, V> {
         this.referenceManager.onReferenceRemove(this::removeReference);
     }
 
-    public V removeReference(ValueReference<K> reference) {
+    public V removeReference(EntryReference<K> reference) {
         return this.map.remove(reference);
     }
 
-    public V putReference(ValueReference<K> reference, V value) {
+    public V putReference(EntryReference<K> reference, V value) {
         return this.map.put(reference, value);
     }
 
@@ -93,9 +93,9 @@ public class ReferencedMap<K, V> implements Map<K, V> {
         return new AbstractSet<K>() {
             @Override
             public java.util.Iterator<K> iterator() {
-                return new ReferencedIterator<K, ValueReference<K>>(ReferencedMap.this.map.keySet().iterator()) {
+                return new ReferencedIterator<K, EntryReference<K>>(ReferencedMap.this.map.keySet().iterator()) {
                     @Override
-                    public K extractKey(ValueReference<K> u) {
+                    public K extractKey(EntryReference<K> u) {
                         return u.get();
                     }
                 };
@@ -126,10 +126,10 @@ public class ReferencedMap<K, V> implements Map<K, V> {
         return new AbstractSet<Entry<K, V>>() {
             @Override
             public java.util.Iterator<Entry<K, V>> iterator() {
-                return new ReferencedIterator<Entry<K, V>, Entry<ValueReference<K>, V>>(ReferencedMap.this.map.entrySet().iterator()) {
+                return new ReferencedIterator<Entry<K, V>, Entry<EntryReference<K>, V>>(ReferencedMap.this.map.entrySet().iterator()) {
 
                     @Override
-                    public Entry<K, V> extractKey(Entry<ValueReference<K>, V> u) {
+                    public Entry<K, V> extractKey(Entry<EntryReference<K>, V> u) {
                         return new SimpleEntry<>(u.getKey().get(), u.getValue());
                     }
                 };

@@ -3,17 +3,18 @@ package net.manga.core.util.collection;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
+import net.manga.api.reference.EntryReference;
 import net.manga.api.reference.ReferenceManager;
-import net.manga.api.reference.ValueReference;
+import net.manga.api.reference.EntryReference;
 import net.manga.core.reference.CoreReferenceManager;
 import org.jetbrains.annotations.NotNull;
 
 public class ReferencedCollection<T> implements Collection<T> {
-    private final Collection<ValueReference<T>> backing;
+    private final Collection<EntryReference<T>> backing;
     private final CoreReferenceManager<T> referenceManager;
 
     public ReferencedCollection(
-        Collection<ValueReference<T>> backing,
+        Collection<EntryReference<T>> backing,
         ReferenceManager<T> referenceManager
     ) {
         this.backing = backing;
@@ -21,11 +22,11 @@ public class ReferencedCollection<T> implements Collection<T> {
         this.referenceManager.onReferenceRemove(this.backing::remove);
     }
 
-    public boolean addReference(ValueReference<T> reference) {
+    public boolean addReference(EntryReference<T> reference) {
         return this.backing.add(reference);
     }
 
-    public boolean removeReference(ValueReference<T> reference) {
+    public boolean removeReference(EntryReference<T> reference) {
         return this.backing.remove(reference);
     }
 
@@ -51,9 +52,9 @@ public class ReferencedCollection<T> implements Collection<T> {
     @Override
     public Iterator<T> iterator() {
         this.referenceManager.runRemoveQueue();
-        return new ReferencedIterator<T, ValueReference<T>>(this.backing.iterator()) {
+        return new ReferencedIterator<T, EntryReference<T>>(this.backing.iterator()) {
             @Override
-            protected T extractKey(ValueReference<T> reference) {
+            protected T extractKey(EntryReference<T> reference) {
                 return reference.get();
             }
         };
@@ -64,7 +65,7 @@ public class ReferencedCollection<T> implements Collection<T> {
     public Object[] toArray() {
         this.referenceManager.runRemoveQueue();
         return this.backing.stream()
-            .map(ValueReference::get)
+            .map(EntryReference::get)
             .filter(Objects::nonNull)
             .toArray();
     }
@@ -74,7 +75,7 @@ public class ReferencedCollection<T> implements Collection<T> {
     public <T1> T1[] toArray(@NotNull T1[] a) {
         this.referenceManager.runRemoveQueue();
         return this.backing.stream()
-            .map(ValueReference::get)
+            .map(EntryReference::get)
             .filter(Objects::nonNull)
             .toArray(($) -> a);
     }
@@ -83,7 +84,7 @@ public class ReferencedCollection<T> implements Collection<T> {
     public boolean add(T t) {
         this.referenceManager.runRemoveQueue();
 
-        final ValueReference<T> reference = this.referenceManager.getOrCreateReference(t);
+        final EntryReference<T> reference = this.referenceManager.getOrCreateReference(t);
         final boolean add = this.backing.add(reference);
 
         if (!add) {
@@ -96,7 +97,7 @@ public class ReferencedCollection<T> implements Collection<T> {
     @Override
     public boolean remove(Object o) {
         this.referenceManager.runRemoveQueue();
-        final ValueReference<T> reference = this.referenceManager.createFetchingReference((T) o);
+        final EntryReference<T> reference = this.referenceManager.createFetchingReference((T) o);
         return this.backing.remove(reference);
     }
 

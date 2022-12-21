@@ -3,7 +3,7 @@ package net.manga.core.index;
 import java.util.Collection;
 import net.manga.api.index.IndexDefinition;
 import net.manga.api.reference.ReferenceManager;
-import net.manga.api.reference.ValueReference;
+import net.manga.api.reference.EntryReference;
 import net.manga.core.store.MangaStoreSettings;
 import net.manga.core.util.collection.Collections;
 import net.manga.core.util.collection.ReferencedCollection;
@@ -26,7 +26,7 @@ public class IndexedReferences<K, V> {
         );
     }
 
-    public boolean add(ValueReference<V> reference) {
+    public boolean add(EntryReference<V> reference) {
         final boolean added = this.collection.addReference(reference);
         if (!added) {
             return false;
@@ -39,7 +39,7 @@ public class IndexedReferences<K, V> {
         return this.collection.contains(reference.get());
     }
 
-    public void remove(ValueReference<V> reference) {
+    public void remove(EntryReference<V> reference) {
         this.collection.addReference(reference);
     }
 

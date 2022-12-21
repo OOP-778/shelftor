@@ -12,7 +12,7 @@ import net.manga.api.index.IndexDefinition;
 import net.manga.api.index.StoreIndex;
 import net.manga.api.index.comparison.ComparisonPolicy;
 import net.manga.api.reference.ReferenceManager;
-import net.manga.api.reference.ValueReference;
+import net.manga.api.reference.EntryReference;
 import net.manga.core.store.MangaCoreStore;
 import net.manga.core.store.MangaStoreSettings;
 import net.manga.core.util.OptionalLocking;
@@ -30,7 +30,7 @@ public class MangaStoreIndex<T, K> extends CloseableHolder implements StoreIndex
 
     private final Map<K, IndexedReferences<K, T>> keyToReferences;
     private final ReferencedMap<T, Collection<K>> referenceToKeys;
-    private final Map<ValueReference<T>, OptionalLocking> locks;
+    private final Map<EntryReference<T>, OptionalLocking> locks;
 
     public MangaStoreIndex(MangaCoreStore<T> store, String name, IndexDefinition<K, T> indexDefinition) {
         this.name = name;
@@ -45,7 +45,7 @@ public class MangaStoreIndex<T, K> extends CloseableHolder implements StoreIndex
     }
 
     @Override
-    public void index(ValueReference<T> reference) {
+    public void index(EntryReference<T> reference) {
         final OptionalLocking optionalLocking = this.locks.computeIfAbsent(reference, ($) -> new OptionalLocking(this.settings.isConcurrent()));
 
         optionalLocking.locking(() -> {
@@ -105,7 +105,7 @@ public class MangaStoreIndex<T, K> extends CloseableHolder implements StoreIndex
         return mapped.stream().map(this::toComparableKey).collect(Collectors.toList());
     }
 
-    private void removeReference(ValueReference<T> reference) {
+    private void removeReference(EntryReference<T> reference) {
         final OptionalLocking optionalLocking = this.locks.computeIfAbsent(reference, r -> new OptionalLocking(this.settings.isConcurrent()));
 
         optionalLocking.locking(() -> {
@@ -117,7 +117,7 @@ public class MangaStoreIndex<T, K> extends CloseableHolder implements StoreIndex
         });
     }
 
-    private void removeReferenceWithoutLocking(ValueReference<T> reference) {
+    private void removeReferenceWithoutLocking(EntryReference<T> reference) {
         final Collection<K> keys = this.referenceToKeys.removeReference(reference);
         if (keys == null) {
             return;

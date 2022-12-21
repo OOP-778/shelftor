@@ -79,7 +79,6 @@ public class MangaCoreStore<T> extends ListenableCollection<T> implements MangaS
         this.referenceManager.runRemoveQueue();
 
         final QueryImpl queryImpl = (QueryImpl) query;
-
         if (!queryImpl.getQueries().isEmpty()) {
             return java.util.Collections.emptySet();
         }
