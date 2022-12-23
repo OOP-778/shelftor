@@ -33,7 +33,6 @@ public interface EntryReference<T> {
 
     static <T> EntryReference<T> strong(T value, boolean identity, EntryReferenceQueue<T> queue) {
         return EntryReference.<T>builder()
-            .weak()
             .identity(identity)
             .managedBy(queue)
             .build(value);

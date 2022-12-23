@@ -104,4 +104,8 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
             this.removeListeners.forEach((listener) -> listener.accept(finalReference));
         }
     }
+
+    public Map<Integer, EntryReference<T>> getReferenceMap() {
+        return this.referenceMap;
+    }
 }

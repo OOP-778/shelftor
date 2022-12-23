@@ -2,6 +2,7 @@ package net.manga.core.store.expiring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import net.manga.api.expiring.policy.ExpiringPolicy;
 import net.manga.api.store.expiring.ExpiringStoreSettings;
 import net.manga.core.store.MangaStoreSettings;
@@ -22,7 +23,7 @@ public class CoreMangaExpiringStoreSettings<T> extends MangaStoreSettings implem
 
     @Override
     public Collection<ExpiringPolicy<T>> expiringPolicies() {
-        return this.policies;
+        return Collections.unmodifiableCollection(this.policies);
     }
 
     public void setCheckInterval(long checkInterval) {

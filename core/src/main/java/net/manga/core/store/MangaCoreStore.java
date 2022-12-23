@@ -15,9 +15,9 @@ import net.manga.core.util.collection.ListenableCollection;
 import org.jetbrains.annotations.Nullable;
 
 public class MangaCoreStore<T> extends ListenableCollection<T> implements MangaStore<T> {
-    private final MangaStoreSettings settings;
-    private final CoreReferenceManager<T> referenceManager;
-    private final IndexManager<T> indexManager;
+    protected final MangaStoreSettings settings;
+    protected final CoreReferenceManager<T> referenceManager;
+    protected final IndexManager<T> indexManager;
 
     public MangaCoreStore(MangaStoreSettings settings) {
         super(

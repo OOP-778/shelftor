@@ -14,8 +14,6 @@ public interface ExpiringStoreBuilder<T, B extends ExpiringStoreBuilder<T, ?>> e
 
     B usePolicy(ExpiringPolicy<T> policy);
 
-    B useExpirationCheck();
-
     @Override
     default ExpiringStoreBuilder<T, ?> expiring() {
         return this;

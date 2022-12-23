@@ -16,6 +16,7 @@ public abstract class ReferencedIterator<T, U> implements java.util.Iterator<T> 
                 return;
             }
         }
+
         this.next = null;
     }
 
@@ -35,7 +36,6 @@ public abstract class ReferencedIterator<T, U> implements java.util.Iterator<T> 
     public void remove() {
         throw new UnsupportedOperationException();
     }
-
 
     protected abstract T extractKey(U u);
 }
