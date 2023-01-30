@@ -5,24 +5,27 @@ import java.util.function.Function;
 import net.manga.api.expiring.policy.ExpiringPolicy;
 import net.manga.api.expiring.policy.ExpiringPolicyWithData;
 import net.manga.api.expiring.policy.implementation.TimedExpiringPolicy.TimedExpirationData;
+import org.jetbrains.annotations.NotNull;
 
 public class TimedExpiringPolicy<T> implements ExpiringPolicyWithData<T, TimedExpirationData> {
+    private final boolean shouldCallOnAccess;
     private final Function<T, TimedExpirationData> expirationDataFunction;
 
-    protected TimedExpiringPolicy(final Function<T, TimedExpirationData> expirationDataFunction) {
+    protected TimedExpiringPolicy(boolean shouldCallOnAccess, final Function<T, TimedExpirationData> expirationDataFunction) {
+        this.shouldCallOnAccess = shouldCallOnAccess;
         this.expirationDataFunction = expirationDataFunction;
     }
 
     public static <T> ExpiringPolicy<T> create(long time, TimeUnit unit, boolean shouldResetAfterAccess) {
-        return new TimedExpiringPolicy<>($ -> new TimedExpirationData(unit, time, shouldResetAfterAccess));
+        return new TimedExpiringPolicy<>(shouldResetAfterAccess, $ -> new TimedExpirationData(unit, time, shouldResetAfterAccess));
     }
 
     public static <T> ExpiringPolicy<T> create(Function<T, TimedExpirationData> expirationDataFunction) {
-        return new TimedExpiringPolicy<>(expirationDataFunction);
+        return new TimedExpiringPolicy<>(true, expirationDataFunction);
     }
 
     @Override
-    public TimedExpirationData createExpirationData(final T value) {
+    public TimedExpirationData createExpirationData(final @NotNull T value) {
         return this.expirationDataFunction.apply(value);
     }
 
@@ -32,7 +35,12 @@ public class TimedExpiringPolicy<T> implements ExpiringPolicyWithData<T, TimedEx
     }
 
     @Override
-    public void onAccess(final T value, final TimedExpirationData data) {
+    public boolean shouldCallOnAccess() {
+        return this.shouldCallOnAccess;
+    }
+
+    @Override
+    public void onAccess(final @NotNull T value, final @NotNull TimedExpirationData data) {
         if (!data.shouldResetAfterAccess) {
             return;
         }

@@ -5,7 +5,7 @@ import net.manga.api.reference.EntryReference;
 import net.manga.api.reference.EntryReferenceBuilder;
 import net.manga.api.reference.EntryReferenceFactory;
 import net.manga.api.reference.EntryReferenceQueue;
-import net.manga.core.reference.queue.CoreAbstractReferenceQueue;
+import net.manga.core.reference.queue.CoreSimpleReferenceQueue;
 import net.manga.core.reference.queue.CoreWeakReferenceQueue;
 import net.manga.core.reference.type.CoreStrongEntryReference;
 import net.manga.core.reference.type.CoreWeakEntryReference;
@@ -28,7 +28,7 @@ public class CoreEntryReferenceBuilder<T> implements EntryReferenceBuilder<T> {
     }
 
     @Override
-    public EntryReferenceBuilder<T> managedBy(@NonNull EntryReferenceQueue<T> queue) {
+    public EntryReferenceBuilder<T> managedBy(EntryReferenceQueue<T> queue) {
         this.queue = queue;
         return this;
     }
@@ -45,7 +45,7 @@ public class CoreEntryReferenceBuilder<T> implements EntryReferenceBuilder<T> {
             }
 
             return new CoreStrongEntryReference<>(
-                ((CoreAbstractReferenceQueue<T>) this.queue),
+                ((CoreSimpleReferenceQueue<T>) this.queue),
                 value,
                 this.identity
             );

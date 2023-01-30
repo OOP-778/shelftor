@@ -7,6 +7,8 @@ public interface EntryReference<T> {
 
     boolean dispose();
 
+    boolean isIdentity();
+
     static <T> EntryReference<T> hashableWeak(T value) {
         return weak(value, false, null);
     }

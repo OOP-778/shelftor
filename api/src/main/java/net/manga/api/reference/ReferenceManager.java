@@ -10,6 +10,8 @@ public interface ReferenceManager<T> {
 
     void releaseReference(@NonNull EntryReference<T> reference);
 
+    void releaseReference(@NonNull T value);
+
     // Create a fetching reference
     // No matter if it's weak or not, it will return strong either hashable or not
     // This is used just for fetching by keys, to not create a real java ref

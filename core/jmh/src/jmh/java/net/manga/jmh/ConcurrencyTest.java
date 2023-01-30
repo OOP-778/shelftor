@@ -2,10 +2,8 @@ package net.manga.jmh;
 
 
 import com.oop.memorystore.api.Store;
-import com.oop.memorystore.implementation.SynchronizedStore;
 import com.oop.memorystore.implementation.memory.MemoryStore;
 import com.oop.memorystore.implementation.query.Query;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
@@ -24,7 +22,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
-@BenchmarkMode(Mode.AverageTime)
+@BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Measurement(time = 1)
 @Warmup(time = 1, iterations = 1)
@@ -89,7 +87,6 @@ public class ConcurrencyTest {
         private String objectA;
         private String objectB;
     }
-
 
     public static class MangaState {
         private final MangaCoreStore<TestObject> store;

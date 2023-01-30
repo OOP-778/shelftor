@@ -1,7 +1,7 @@
 package net.manga.core.query;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import lombok.NonNull;
 import net.manga.api.query.Query;
 
@@ -9,7 +9,7 @@ public class QueryImpl implements Query {
     private String index;
     private Object value;
     private Operator operator;
-    private Collection<QueryImpl> queries;
+    private List<QueryImpl> queries;
 
     public QueryImpl() {
         this.queries = new ArrayList<>();
@@ -34,12 +34,12 @@ public class QueryImpl implements Query {
         return this.index;
     }
 
-    public Collection<QueryImpl> getQueries() {
+    public List<QueryImpl> getQueries() {
         return this.queries;
     }
 
-    private boolean isInitialized() {
-        return this.index == null && this.value == null && this.operator == null;
+    public boolean isInitialized() {
+        return !(this.index == null && this.value == null);
     }
 
     @Override
@@ -78,28 +78,34 @@ public class QueryImpl implements Query {
 
     @Override
     public Query or(@NonNull String index, @NonNull Object value) {
-        if (this.isInitialized()) {
+        if (!this.isInitialized()) {
             this.index = index;
             this.value = value;
             this.operator = Operator.OR;
             return this;
         }
 
+        this.operator = Operator.OR;
         this.queries.add(new QueryImpl(index, value, Operator.OR));
         return this;
     }
 
     @Override
     public Query and(@NonNull String index, @NonNull Object value) {
-        if (this.isInitialized()) {
+        if (!this.isInitialized()) {
             this.index = index;
             this.value = value;
             this.operator = Operator.AND;
             return this;
         }
 
+        this.operator = Operator.AND;
         this.queries.add(new QueryImpl(index, value, Operator.AND));
         return this;
+    }
+
+    public QueryImpl single() {
+        return new QueryImpl(this.index, this.value, this.operator);
     }
 
     public enum Operator {

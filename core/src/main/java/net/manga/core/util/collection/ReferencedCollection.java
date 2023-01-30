@@ -1,25 +1,34 @@
 package net.manga.core.util.collection;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.Function;
 import net.manga.api.reference.EntryReference;
 import net.manga.api.reference.ReferenceManager;
-import net.manga.api.reference.EntryReference;
 import net.manga.core.reference.CoreReferenceManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ReferencedCollection<T> implements Collection<T> {
     private final Collection<EntryReference<T>> backing;
     private final CoreReferenceManager<T> referenceManager;
+    private Function<T, EntryReference<T>> referenceFunction;
 
     public ReferencedCollection(
         Collection<EntryReference<T>> backing,
-        ReferenceManager<T> referenceManager
+        @Nullable ReferenceManager<T> referenceManager
     ) {
         this.backing = backing;
-        this.referenceManager = (CoreReferenceManager<T>) referenceManager;
-        this.referenceManager.onReferenceRemove(this.backing::remove);
+        if ((this.referenceManager = (CoreReferenceManager<T>) referenceManager) != null) {
+            this.referenceManager.onReferenceRemove(this.backing::remove);
+            this.referenceFunction = this.referenceManager::createFetchingReference;
+        }
+    }
+
+    public void setFetcher(Function<T, EntryReference<T>> referenceFunction) {
+        this.referenceFunction = referenceFunction;
     }
 
     public boolean addReference(EntryReference<T> reference) {
@@ -32,26 +41,26 @@ public class ReferencedCollection<T> implements Collection<T> {
 
     @Override
     public int size() {
-        this.referenceManager.runRemoveQueue();
+        this.runRemoveInvalid();
         return this.backing.size();
     }
 
     @Override
     public boolean isEmpty() {
-        this.referenceManager.runRemoveQueue();
+        this.runRemoveInvalid();
         return this.backing.isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        this.referenceManager.runRemoveQueue();
-        return this.backing.contains(this.referenceManager.createFetchingReference((T) o));
+        this.runRemoveInvalid();
+        return this.backing.contains(this.referenceFunction.apply((T) o));
     }
 
     @NotNull
     @Override
     public Iterator<T> iterator() {
-        this.referenceManager.runRemoveQueue();
+        this.runRemoveInvalid();
         return new ReferencedIterator<T, EntryReference<T>>(this.backing.iterator()) {
             @Override
             protected T extractKey(EntryReference<T> reference) {
@@ -63,7 +72,7 @@ public class ReferencedCollection<T> implements Collection<T> {
     @NotNull
     @Override
     public Object[] toArray() {
-        this.referenceManager.runRemoveQueue();
+        this.runRemoveInvalid();
         return this.backing.stream()
             .map(EntryReference::get)
             .filter(Objects::nonNull)
@@ -73,7 +82,7 @@ public class ReferencedCollection<T> implements Collection<T> {
     @NotNull
     @Override
     public <T1> T1[] toArray(@NotNull T1[] a) {
-        this.referenceManager.runRemoveQueue();
+        this.runRemoveInvalid();
         return this.backing.stream()
             .map(EntryReference::get)
             .filter(Objects::nonNull)
@@ -82,7 +91,7 @@ public class ReferencedCollection<T> implements Collection<T> {
 
     @Override
     public boolean add(T t) {
-        this.referenceManager.runRemoveQueue();
+        this.runRemoveInvalid();
 
         final EntryReference<T> reference = this.referenceManager.getOrCreateReference(t);
         final boolean add = this.backing.add(reference);
@@ -96,7 +105,7 @@ public class ReferencedCollection<T> implements Collection<T> {
 
     @Override
     public boolean remove(Object o) {
-        this.referenceManager.runRemoveQueue();
+        this.runRemoveInvalid();
         final EntryReference<T> reference = this.referenceManager.createFetchingReference((T) o);
         return this.backing.remove(reference);
     }
@@ -149,5 +158,21 @@ public class ReferencedCollection<T> implements Collection<T> {
     @Override
     public void clear() {
         this.backing.clear();
+    }
+
+    protected void runRemoveInvalid() {
+        if (this.referenceManager == null) {
+            return;
+        }
+
+        this.referenceManager.runRemoveQueue();
+    }
+
+    public Collection<T> unmodifiable() {
+        return Collections.unmodifiableCollection(this);
+    }
+
+    public Collection<EntryReference<T>> getBacking() {
+        return this.backing;
     }
 }

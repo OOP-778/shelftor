@@ -1,9 +1,8 @@
 package net.manga.core.index;
 
-import java.util.Collection;
 import net.manga.api.index.IndexDefinition;
-import net.manga.api.reference.ReferenceManager;
 import net.manga.api.reference.EntryReference;
+import net.manga.api.reference.ReferenceManager;
 import net.manga.core.store.MangaStoreSettings;
 import net.manga.core.util.collection.Collections;
 import net.manga.core.util.collection.ReferencedCollection;
@@ -43,7 +42,7 @@ public class IndexedReferences<K, V> {
         this.collection.addReference(reference);
     }
 
-    public Collection<V> getCollection() {
-        return java.util.Collections.unmodifiableCollection(this.collection);
+    public ReferencedCollection<V> getCollection() {
+        return this.collection;
     }
 }

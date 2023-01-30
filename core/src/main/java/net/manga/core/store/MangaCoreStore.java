@@ -1,17 +1,24 @@
 package net.manga.core.store;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import lombok.NonNull;
 import net.manga.api.index.IndexDefinition;
 import net.manga.api.index.StoreIndex;
 import net.manga.api.query.Query;
+import net.manga.api.reference.EntryReference;
 import net.manga.api.store.MangaStore;
 import net.manga.core.index.IndexManager;
 import net.manga.core.index.MangaStoreIndex;
 import net.manga.core.query.QueryImpl;
+import net.manga.core.query.QueryImpl.Operator;
 import net.manga.core.reference.CoreReferenceManager;
 import net.manga.core.util.collection.Collections;
 import net.manga.core.util.collection.ListenableCollection;
+import net.manga.core.util.collection.ReferencedCollection;
 import org.jetbrains.annotations.Nullable;
 
 public class MangaCoreStore<T> extends ListenableCollection<T> implements MangaStore<T> {
@@ -56,7 +63,13 @@ public class MangaCoreStore<T> extends ListenableCollection<T> implements MangaS
     @Override
     public boolean remove(Object o) {
         this.referenceManager.runRemoveQueue();
-        return super.remove(o);
+        final boolean result = super.remove(o);
+
+        if (result) {
+            this.referenceManager.releaseReference((T) o);
+        }
+
+        return result;
     }
 
     @Override
@@ -76,23 +89,75 @@ public class MangaCoreStore<T> extends ListenableCollection<T> implements MangaS
 
     @Override
     public Collection<T> get(@NonNull Query query, int limit) {
+        return this._get(query, limit);
+    }
+
+    protected ReferencedCollection<T> _get(@NonNull Query query, int limit) {
         this.referenceManager.runRemoveQueue();
 
-        final QueryImpl queryImpl = (QueryImpl) query;
-        if (!queryImpl.getQueries().isEmpty()) {
-            return java.util.Collections.emptySet();
+        final QueryImpl rootQuery = (QueryImpl) query;
+        return this.fetch(rootQuery);
+    }
+
+    private ReferencedCollection<T> fetch(QueryImpl query) {
+        if (query.isInitialized() && query.getQueries().isEmpty()) {
+            return this.fetchSingle(query);
         }
 
-        final MangaStoreIndex<T, Object> index = this.getIndex(queryImpl.getIndex());
+        final List<QueryImpl> fetchFrom = new ArrayList<>();
+        if (query.isInitialized()) {
+            fetchFrom.add(query.single());
+        }
+
+        fetchFrom.addAll(query.getQueries());
+
+        final Collection<EntryReference<T>> result = new LinkedHashSet<>();
+
+        for (final QueryImpl singleQuery : fetchFrom) {
+            final ReferencedCollection<T> fetch = this.fetch(singleQuery);
+            if (query.getOperator() == Operator.AND && fetch.isEmpty()) {
+                return fetch;
+            }
+
+            if (query.getOperator() == Operator.AND) {
+                if (result.isEmpty()) {
+                    result.addAll(fetch.getBacking());
+                } else {
+                    result.retainAll(fetch.getBacking());
+                }
+            }
+
+            if (query.getOperator() == Operator.OR) {
+                result.addAll(fetch.getBacking());
+            }
+        }
+
+        final ReferencedCollection<T> finalCollection = new ReferencedCollection<>(result, null);
+        finalCollection.setFetcher(this.referenceManager::createFetchingReference);
+
+        return finalCollection;
+    }
+
+    private ReferencedCollection<T> fetchSingle(QueryImpl query) {
+        final MangaStoreIndex<T, Object> index = this.getIndex(query.getIndex());
         if (index == null) {
-            return java.util.Collections.emptySet();
+            throw new IllegalStateException(String.format("Invalid index by name `%s`", query.getIndex()));
         }
 
-        return index.get(queryImpl.getValue());
+        return index.get(query.getValue());
     }
 
     @Override
     public Collection<T> remove(Query query) {
-        return null;
+        final Collection<T> toRemove = this.get(query);
+        for (final T value : new HashSet<>(toRemove)) {
+            this.remove(value);
+        }
+
+        return toRemove;
+    }
+
+    protected void onAccess(EntryReference<T> reference) {
+
     }
 }

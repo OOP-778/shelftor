@@ -5,12 +5,10 @@ import static org.openjdk.jcstress.annotations.Expect.ACCEPTABLE;
 import net.manga.api.store.MangaStore;
 import net.manga.core.MangaCore;
 import org.openjdk.jcstress.annotations.Actor;
-import org.openjdk.jcstress.annotations.JCStressTest;
 import org.openjdk.jcstress.annotations.Outcome;
 import org.openjdk.jcstress.annotations.State;
 import org.openjdk.jcstress.infra.results.ZZ_Result;
 
-@JCStressTest
 @Outcome(id = "true, false", expect = ACCEPTABLE, desc = "Yes")
 @Outcome(id = "false, true", expect = ACCEPTABLE, desc = "Yes")
 public class AddTest {

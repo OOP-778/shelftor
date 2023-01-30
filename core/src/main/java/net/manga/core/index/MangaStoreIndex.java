@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +20,9 @@ import net.manga.core.store.MangaStoreSettings;
 import net.manga.core.util.OptionalLocking;
 import net.manga.core.util.closeable.CloseableHolder;
 import net.manga.core.util.collection.Collections;
+import net.manga.core.util.collection.ReferencedCollection;
 import net.manga.core.util.collection.ReferencedMap;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 @SuppressWarnings("unchecked")
@@ -92,10 +96,11 @@ public class MangaStoreIndex<T, K> extends CloseableHolder implements StoreIndex
 
     @Override
     @Unmodifiable
-    public Collection<T> get(K key) {
+    @NotNull
+    public ReferencedCollection<T> get(K key) {
         final IndexedReferences<K, T> indexedReferences = this.keyToReferences.get(key);
         if (indexedReferences == null) {
-            return java.util.Collections.emptySet();
+            return new ReferencedCollection<>(new ArrayList<>(), null);
         }
 
         return indexedReferences.getCollection();

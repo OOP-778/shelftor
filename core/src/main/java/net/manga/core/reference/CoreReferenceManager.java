@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import lombok.NonNull;
 import net.manga.api.reference.EntryReference;
 import net.manga.api.reference.EntryReferenceQueue;
 import net.manga.api.reference.ReferenceManager;
@@ -16,6 +17,7 @@ import net.manga.core.reference.queue.CoreSimpleReferenceQueue;
 import net.manga.core.reference.queue.CoreWeakReferenceQueue;
 import net.manga.core.store.MangaCoreStore;
 import net.manga.core.store.MangaStoreSettings;
+import net.manga.core.util.log.LogDebug;
 import org.jetbrains.annotations.NotNull;
 
 public class CoreReferenceManager<T> implements ReferenceManager<T> {
@@ -30,7 +32,7 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
     public CoreReferenceManager(MangaCoreStore<T> store) {
         this.settings = store.getSettings();
         this.referenceFactory = this.createReferenceFactory();
-        this.referenceQueue = this.settings.isWeak() ? new CoreWeakReferenceQueue<>(this.settings) : new CoreSimpleReferenceQueue<>(this.settings);
+        this.referenceQueue = this.settings.isWeak() ? new CoreWeakReferenceQueue<>() : new CoreSimpleReferenceQueue<>(this.settings);
         this.referenceMap = this.settings.isConcurrent() ? new ConcurrentHashMap<>() : new HashMap<>();
         this.removeListeners = this.settings.isConcurrent() ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
         this.addListeners = this.settings.isConcurrent() ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
@@ -54,6 +56,14 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
     @Override
     public void releaseReference(@NotNull EntryReference<T> reference) {
         reference.dispose();
+    }
+
+    @Override
+    public void releaseReference(@NonNull T value) {
+        final EntryReference<T> existingReference = this.referenceMap.remove(this.hash(value));
+        if (existingReference != null) {
+            existingReference.dispose();
+        }
     }
 
     @Override
@@ -99,9 +109,11 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
         }
 
         EntryReference<T> reference;
-        while ((reference = this.referenceQueue.poll()) != null) {
+        while ((reference = this.referenceQueue.safePoll()) != null) {
             final EntryReference<T> finalReference = reference;
             this.removeListeners.forEach((listener) -> listener.accept(finalReference));
+
+            LogDebug.log("[ReferenceManager] Removed reference: %s", finalReference);
         }
     }
 

@@ -1,27 +1,23 @@
 package net.manga.core.reference.type;
 
 import java.lang.ref.WeakReference;
-import java.util.Optional;
-import net.manga.core.reference.queue.CoreAbstractReferenceQueue;
+import net.manga.api.reference.EntryReference;
 import net.manga.core.reference.queue.CoreWeakReferenceQueue;
 import org.jetbrains.annotations.Nullable;
 
-public class CoreWeakEntryReference<T> extends CoreAbstractEntryReference<T> {
-    private final WeakReference<T> backingReference;
+public class CoreWeakEntryReference<T> extends WeakReference<T> implements EntryReference<T> {
+    private final CoreRererenceProps<T> props;
+    private final CoreWeakReferenceQueue<T> queue;
 
-    public CoreWeakEntryReference(@Nullable CoreAbstractReferenceQueue<T> queue, T referent, boolean identity) {
-        super(queue, referent, identity);
-        this.backingReference = new WeakReference<>(
-            referent,
-            Optional.ofNullable(queue)
-                .map(($) -> ((CoreWeakReferenceQueue<T>) queue).getBackingGcQueue())
-                .orElse(null)
-        );
+    public CoreWeakEntryReference(@Nullable CoreWeakReferenceQueue<T> queue, T referent, boolean identity) {
+        super(referent, queue);
+        this.props = new CoreRererenceProps<>(identity, referent);
+        this.queue = queue;
     }
 
     @Override
     public T get() {
-        return this.backingReference.get();
+        return super.get();
     }
 
     @Override
@@ -30,9 +26,32 @@ public class CoreWeakEntryReference<T> extends CoreAbstractEntryReference<T> {
             return false;
         }
 
-        this.backingReference.clear();
-        this.queue.offer(this);
+        super.enqueue();
+        super.clear();
 
         return true;
+    }
+
+    @Override
+    public boolean isIdentity() {
+        return this.props.isIdentity();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj instanceof EntryReference<?>) {
+            return this.hashCode() == obj.hashCode();
+        }
+
+        return this.isIdentity() ? this.hashCode() == System.identityHashCode(obj) : obj.hashCode() == this.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.props.getHashCode();
     }
 }
