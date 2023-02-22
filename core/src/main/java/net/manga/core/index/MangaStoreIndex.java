@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,8 +11,8 @@ import java.util.stream.Collectors;
 import net.manga.api.index.IndexDefinition;
 import net.manga.api.index.StoreIndex;
 import net.manga.api.index.comparison.ComparisonPolicy;
-import net.manga.api.reference.ReferenceManager;
 import net.manga.api.reference.EntryReference;
+import net.manga.api.reference.ReferenceManager;
 import net.manga.core.store.MangaCoreStore;
 import net.manga.core.store.MangaStoreSettings;
 import net.manga.core.util.OptionalLocking;
@@ -91,7 +89,7 @@ public class MangaStoreIndex<T, K> extends CloseableHolder implements StoreIndex
 
     @Override
     public Optional<T> findFirst(K key) {
-        return Optional.empty();
+        return this.get(key).stream().findFirst();
     }
 
     @Override

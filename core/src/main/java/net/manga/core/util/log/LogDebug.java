@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Deque;
 
 public class LogDebug {
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     public static void log(String message, Object... args) {
         if (!DEBUG) {

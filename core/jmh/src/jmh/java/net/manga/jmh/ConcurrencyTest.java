@@ -22,11 +22,11 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
-@BenchmarkMode(Mode.Throughput)
+@BenchmarkMode(Mode.All)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Measurement(time = 1)
-@Warmup(time = 1, iterations = 1)
-@Threads(20)
+@Warmup(time = 1, iterations = 3)
+@Threads(50)
 @Fork(1)
 @State(org.openjdk.jmh.annotations.Scope.Benchmark)
 public class ConcurrencyTest {
