@@ -2,7 +2,7 @@ package dev.oop778.shelftor.api.store;
 
 import dev.oop778.shelftor.api.store.expiring.ExpiringShelfBuilder;
 
-public interface StoreBuilder<T, B extends StoreBuilder<T, ?>> {
+public interface ShelfBuilder<T, B extends ShelfBuilder<T, ?>> {
     /**
      * Make the store use hashable references rather than identity references.
      */

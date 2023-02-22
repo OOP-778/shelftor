@@ -1,9 +1,10 @@
 plugins {
     id 'java'
-    id 'checkstyle'
+    id 'maven-publish'
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
-group 'net.manga'
+group 'dev.oop778.shelftor'
 version '0.0.1'
 
 repositories {

@@ -2,7 +2,8 @@ package dev.oop778.shelftor.api;
 
 import dev.oop778.shelftor.api.query.Query;
 import dev.oop778.shelftor.api.reference.EntryReferenceBuilder;
-import dev.oop778.shelftor.api.store.StoreBuilder;
+import dev.oop778.shelftor.api.store.ShelfBuilder;
+import java.util.Objects;
 
 public abstract class Shelftor {
     private static Shelftor INSTANCE;
@@ -12,6 +13,13 @@ public abstract class Shelftor {
     }
 
     public static Shelftor get() {
+        if (INSTANCE == null) {
+            try {
+                Class.forName("dev.oop778.shelftor.core.CoreShelftor");
+            } catch (ClassNotFoundException ignored) {}
+        }
+
+        Objects.requireNonNull(INSTANCE, "Shelftor has not been initialized");
         return INSTANCE;
     }
 
@@ -21,7 +29,7 @@ public abstract class Shelftor {
 
     public abstract Query createQuery();
 
-    public abstract <T> StoreBuilder<T, ?> createBuilder();
+    public abstract <T> ShelfBuilder<T, ?> createBuilder();
 
     public abstract <T> EntryReferenceBuilder<T> createReferenceBuilder();
 }

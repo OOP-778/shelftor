@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public interface Shelf<T> extends Collection<T>, Indexable<T>, Queryable<T> {
 
-    static <T> StoreBuilder<T, ?> builder() {
+    static <T> ShelfBuilder<T, ?> builder() {
         return Shelftor.get().createBuilder();
     }
 }

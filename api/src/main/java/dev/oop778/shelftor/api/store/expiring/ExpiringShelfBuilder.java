@@ -2,9 +2,9 @@ package dev.oop778.shelftor.api.store.expiring;
 
 import java.util.concurrent.TimeUnit;
 import dev.oop778.shelftor.api.expiring.policy.ExpiringPolicy;
-import dev.oop778.shelftor.api.store.StoreBuilder;
+import dev.oop778.shelftor.api.store.ShelfBuilder;
 
-public interface ExpiringShelfBuilder<T, B extends ExpiringShelfBuilder<T, ?>> extends StoreBuilder<T, B> {
+public interface ExpiringShelfBuilder<T, B extends ExpiringShelfBuilder<T, ?>> extends ShelfBuilder<T, B> {
 
     B expireCheckInterval(long interval);
 

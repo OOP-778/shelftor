@@ -2,7 +2,6 @@ package dev.oop778.shelftor.core.test.helper;
 
 import dev.oop778.shelftor.api.index.IndexDefinition;
 import dev.oop778.shelftor.api.store.Shelf;
-import dev.oop778.shelftor.core.CoreShelftor;
 import dev.oop778.shelftor.core.test.helper.data.DataGenerator;
 import dev.oop778.shelftor.core.test.helper.data.Student;
 import dev.oop778.shelftor.core.util.log.LogDebug;
@@ -17,7 +16,6 @@ public class TestBase {
     protected static final Map<String, Map<Object, Integer>> DATA_COUNT;
 
     static {
-        new CoreShelftor();
         LogDebug.DEBUG = true;
 
         BASIC_STORE = Shelf.<Student>builder()

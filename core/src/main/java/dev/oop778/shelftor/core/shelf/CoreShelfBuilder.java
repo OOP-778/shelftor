@@ -3,10 +3,10 @@ package dev.oop778.shelftor.core.shelf;
 import dev.oop778.shelftor.core.shelf.expiring.CoreExpiringShelfBuilder;
 import java.util.function.UnaryOperator;
 import dev.oop778.shelftor.api.store.Shelf;
-import dev.oop778.shelftor.api.store.StoreBuilder;
+import dev.oop778.shelftor.api.store.ShelfBuilder;
 import dev.oop778.shelftor.api.store.expiring.ExpiringShelfBuilder;
 
-public class CoreShelfBuilder<T, B extends StoreBuilder<T, ?>> implements StoreBuilder<T, B> {
+public class CoreShelfBuilder<T, B extends ShelfBuilder<T, ?>> implements ShelfBuilder<T, B> {
     protected CoreShelfSettings settings = CoreShelfSettings.create();
 
     public CoreShelfBuilder() {
