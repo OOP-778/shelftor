@@ -1,4 +1,4 @@
-rootProject.name = 'manga'
+rootProject.name = 'shelftor'
 
 include 'api'
 include 'core'

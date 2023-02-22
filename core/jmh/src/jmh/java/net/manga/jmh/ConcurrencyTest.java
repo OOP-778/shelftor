@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import net.manga.core.MangaCore;
-import net.manga.core.store.MangaCoreStore;
+import dev.oop778.shelftor.core.CoreShelftor;
+import dev.oop778.shelftor.core.shelf.CoreShelf;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -39,7 +39,7 @@ public class ConcurrencyTest {
         new Thread(() -> {
             while (true) {
 
-                mangaState.store.get(net.manga.api.query.Query.where("test", "test"));
+                mangaState.store.get(dev.oop778.shelftor.api.query.Query.where("test", "test"));
 
                 try {
                     Thread.sleep(100);
@@ -89,12 +89,12 @@ public class ConcurrencyTest {
     }
 
     public static class MangaState {
-        private final MangaCoreStore<TestObject> store;
+        private final CoreShelf<TestObject> store;
 
         public MangaState() {
-            new MangaCore();
+            new CoreShelftor();
 
-            this.store = MangaCoreStore.<TestObject>builder()
+            this.store = CoreShelf.<TestObject>builder()
                 .concurrent()
                 .hashable()
                 .build();
