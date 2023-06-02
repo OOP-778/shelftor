@@ -7,12 +7,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class CoreWeakEntryReference<T> extends WeakReference<T> implements EntryReference<T> {
     private final CoreRererenceProps<T> props;
-    private final CoreWeakReferenceQueue<T> queue;
 
     public CoreWeakEntryReference(@Nullable CoreWeakReferenceQueue<T> queue, T referent, boolean identity) {
         super(referent, queue);
         this.props = new CoreRererenceProps<>(identity, referent);
-        this.queue = queue;
     }
 
     @Override

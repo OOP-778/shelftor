@@ -113,7 +113,7 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
             final EntryReference<T> finalReference = reference;
             this.removeListeners.forEach((listener) -> listener.accept(finalReference));
 
-            LogDebug.log("[ReferenceManager] Removed reference: %s", finalReference);
+            LogDebug.log("Removed reference: %s", finalReference);
         }
     }
 

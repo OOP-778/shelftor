@@ -20,11 +20,12 @@ class ExpiringTest extends TestBase {
     void automaticExpiration() {
         final Student student = Student.dummy();
 
-        final Shelf<Student> store = Shelf.<Student>builder()
+        final ExpiringShelf<Student> store = Shelf.<Student>builder()
             .expiring()
             .usePolicy(TimedExpiringPolicy.create(100, TimeUnit.MILLISECONDS, true))
             .build();
         initBaseIndexes(store);
+        store.onExpire((object) -> System.out.println("Expired: " + object));
 
         store.add(student);
 

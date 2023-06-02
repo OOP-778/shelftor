@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import dev.oop778.shelftor.api.reference.EntryReference;
 import dev.oop778.shelftor.core.reference.queue.CoreSimpleReferenceQueue;
 
-public class CoreStrongEntryReference<T> implements EntryReference<T> {
+public class CoreStrongEntryReference<T> implements EntryReference<T>, EntryReference.ListenableDisposable {
     private final AtomicReference<T> referentReference;
     private final CoreRererenceProps<T> props;
     private final CoreSimpleReferenceQueue<T> queue;
@@ -26,7 +26,6 @@ public class CoreStrongEntryReference<T> implements EntryReference<T> {
             return false;
         }
 
-        this.referentReference.set(null);
         this.queue.safeOffer(this);
 
         return true;
@@ -53,5 +52,10 @@ public class CoreStrongEntryReference<T> implements EntryReference<T> {
     @Override
     public int hashCode() {
         return this.props.getHashCode();
+    }
+
+    @Override
+    public void postListenDispose() {
+        this.referentReference.set(null);
     }
 }

@@ -25,7 +25,7 @@ public class LogDebug {
         final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
         final Deque<StackTraceElement> elements = new ArrayDeque<>(Arrays.asList(stackTrace));
-        elements.removeIf((element) -> element.getClassName().contains("net.manga.core.util.log"));
+        elements.removeIf((element) -> element.getClassName().contains("dev.oop778.shelftor.core.util.log"));
 
         elements.removeFirst();
         return elements;

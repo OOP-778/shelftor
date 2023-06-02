@@ -11,14 +11,16 @@ repositories {
     mavenCentral()
 }
 
-allprojects {
+subprojects {
     apply {
         plugin("java")
+        plugin("com.github.johnrengelman.shadow")
+        plugin("maven-publish")
     }
 
     repositories {
         mavenCentral()
-        maven {setUrl("https://repo.codemc.io/repository/maven-public/")}
+        maven { setUrl("https://repo.codemc.io/repository/maven-public/") }
     }
 
     dependencies {
@@ -28,5 +30,34 @@ allprojects {
 
         testImplementation(libs.lombok)
         testAnnotationProcessor(libs.lombok)
+    }
+
+    if (!project.name.contains("jmh") && !project.name.contains("jcstress")) {
+        tasks {
+            shadowJar {
+                finalizedBy(publish)
+                archiveFileName = "shelftor-${project.name}.jar"
+                destinationDirectory = file(rootDir.toString() + File.separator + "out")
+            }
+
+            build.dependsOn(shadowJar)
+            build.dependsOn(publish)
+        }
+
+        publishing {
+            repositories {
+                mavenLocal()
+            }
+
+            publications {
+                register("mavenJava", MavenPublication.class) {
+                    artifact(file("out/shelftor-${project.name}.jar"))
+
+                    groupId("dev.oop778.shelftor")
+                    artifactId("shelftor-${project.name}")
+                    version(rootProject.version.toString())
+                }
+            }
+        }
     }
 }

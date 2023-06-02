@@ -43,4 +43,8 @@ public interface EntryReference<T> {
     static <T> EntryReferenceBuilder<T> builder() {
         return Shelftor.get().createReferenceBuilder();
     }
+
+    interface ListenableDisposable {
+        void postListenDispose();
+    }
 }

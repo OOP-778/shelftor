@@ -28,13 +28,13 @@ public class ExpirationManager<T> extends CloseableHolder {
 
         // Handle removing of references
         this.addCloseable(referenceManager.onReferenceRemove((reference) -> {
-            LogDebug.log("[ExpirationManager]: Reference removed: " + reference.get());
+            LogDebug.log("Reference removed: " + reference.get());
             this.expirationData.remove(reference.hashCode());
         }));
 
         // Handle reference creation
         this.addCloseable(referenceManager.onReferenceCreated((reference) -> {
-            LogDebug.log("[ExpirationManager]: Reference created: " + reference.get());
+            LogDebug.log("Reference created: " + reference.get());
             for (final ExpiringPolicy<T> expiringPolicy : this.settings.expiringPolicies()) {
                 if (!(expiringPolicy instanceof ExpiringPolicyWithData)) {
                     continue;
