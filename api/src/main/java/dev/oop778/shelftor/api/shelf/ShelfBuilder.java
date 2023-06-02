@@ -1,6 +1,6 @@
-package dev.oop778.shelftor.api.store;
+package dev.oop778.shelftor.api.shelf;
 
-import dev.oop778.shelftor.api.store.expiring.ExpiringShelfBuilder;
+import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelfBuilder;
 
 public interface ShelfBuilder<T, B extends ShelfBuilder<T, ?>> {
     /**

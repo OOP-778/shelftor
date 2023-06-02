@@ -4,7 +4,7 @@ import dev.oop778.shelftor.core.query.CoreQuery;
 import dev.oop778.shelftor.core.query.CoreQuery.Operator;
 import dev.oop778.shelftor.core.util.collection.ListenableCollection;
 import dev.oop778.shelftor.core.util.collection.ReferencedCollection;
-import dev.oop778.shelftor.api.store.Shelf;
+import dev.oop778.shelftor.api.shelf.Shelf;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;

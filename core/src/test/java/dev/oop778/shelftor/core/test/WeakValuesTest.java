@@ -2,7 +2,7 @@ package dev.oop778.shelftor.core.test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import dev.oop778.shelftor.api.store.Shelf;
+import dev.oop778.shelftor.api.shelf.Shelf;
 import dev.oop778.shelftor.core.shelf.CoreShelf;
 import dev.oop778.shelftor.core.test.helper.TestBase;
 import dev.oop778.shelftor.core.test.helper.data.Student;

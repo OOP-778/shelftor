@@ -1,7 +1,7 @@
 package dev.oop778.shelftor.core.test.helper;
 
 import dev.oop778.shelftor.api.index.IndexDefinition;
-import dev.oop778.shelftor.api.store.Shelf;
+import dev.oop778.shelftor.api.shelf.Shelf;
 import dev.oop778.shelftor.core.test.helper.data.DataGenerator;
 import dev.oop778.shelftor.core.test.helper.data.Student;
 import dev.oop778.shelftor.core.util.log.LogDebug;

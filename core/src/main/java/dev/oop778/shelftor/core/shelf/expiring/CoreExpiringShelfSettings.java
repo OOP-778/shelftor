@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import dev.oop778.shelftor.api.expiring.policy.ExpiringPolicy;
-import dev.oop778.shelftor.api.store.expiring.ExpiringShelfSettings;
+import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelfSettings;
 
 public class CoreExpiringShelfSettings<T> extends CoreShelfSettings implements ExpiringShelfSettings {
     private final Collection<ExpiringPolicy<T>> policies;

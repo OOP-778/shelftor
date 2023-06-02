@@ -2,7 +2,7 @@ package dev.oop778.shelftor.core.jcstress;
 
 import static org.openjdk.jcstress.annotations.Expect.ACCEPTABLE;
 
-import dev.oop778.shelftor.api.store.Shelf;
+import dev.oop778.shelftor.api.shelf.Shelf;
 import dev.oop778.shelftor.core.CoreShelftor;
 import org.openjdk.jcstress.annotations.Actor;
 import org.openjdk.jcstress.annotations.Outcome;

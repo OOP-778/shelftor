@@ -1,4 +1,4 @@
-package dev.oop778.shelftor.api.store;
+package dev.oop778.shelftor.api.shelf;
 
 public interface ShelfSettings {
     boolean isConcurrent();

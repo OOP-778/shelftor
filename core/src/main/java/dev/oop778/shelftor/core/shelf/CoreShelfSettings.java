@@ -1,7 +1,7 @@
 package dev.oop778.shelftor.core.shelf;
 
 import lombok.ToString;
-import dev.oop778.shelftor.api.store.ShelfSettings;
+import dev.oop778.shelftor.api.shelf.ShelfSettings;
 
 @ToString
 public class CoreShelfSettings implements ShelfSettings {

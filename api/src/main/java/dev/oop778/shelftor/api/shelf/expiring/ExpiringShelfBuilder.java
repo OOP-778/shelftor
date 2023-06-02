@@ -1,8 +1,8 @@
-package dev.oop778.shelftor.api.store.expiring;
+package dev.oop778.shelftor.api.shelf.expiring;
 
 import java.util.concurrent.TimeUnit;
 import dev.oop778.shelftor.api.expiring.policy.ExpiringPolicy;
-import dev.oop778.shelftor.api.store.ShelfBuilder;
+import dev.oop778.shelftor.api.shelf.ShelfBuilder;
 
 public interface ExpiringShelfBuilder<T, B extends ExpiringShelfBuilder<T, ?>> extends ShelfBuilder<T, B> {
 

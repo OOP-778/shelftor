@@ -2,7 +2,7 @@ package dev.oop778.shelftor.core;
 
 import dev.oop778.shelftor.api.Shelftor;
 import dev.oop778.shelftor.api.reference.EntryReferenceBuilder;
-import dev.oop778.shelftor.api.store.ShelfBuilder;
+import dev.oop778.shelftor.api.shelf.ShelfBuilder;
 import dev.oop778.shelftor.api.query.Query;
 import dev.oop778.shelftor.core.query.CoreQuery;
 import dev.oop778.shelftor.core.reference.CoreEntryReferenceBuilder;

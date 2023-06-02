@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.NonNull;
 import dev.oop778.shelftor.api.reference.EntryReference;
 import dev.oop778.shelftor.api.reference.EntryReferenceQueue;
-import dev.oop778.shelftor.api.store.ShelfSettings;
+import dev.oop778.shelftor.api.shelf.ShelfSettings;
 import org.jetbrains.annotations.Nullable;
 
 public class CoreSimpleReferenceQueue<T> implements EntryReferenceQueue<T> {

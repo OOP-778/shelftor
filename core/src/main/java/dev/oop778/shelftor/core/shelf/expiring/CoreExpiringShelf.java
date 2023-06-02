@@ -3,7 +3,7 @@ package dev.oop778.shelftor.core.shelf.expiring;
 import dev.oop778.shelftor.api.expiring.policy.ExpiringPolicyWithData;
 import dev.oop778.shelftor.api.query.Query;
 import dev.oop778.shelftor.api.reference.EntryReference;
-import dev.oop778.shelftor.api.store.expiring.ExpiringShelf;
+import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
 import dev.oop778.shelftor.api.util.Closeable;
 import dev.oop778.shelftor.core.expiring.ExpirationManager;
 import dev.oop778.shelftor.core.shelf.CoreShelf;

@@ -1,8 +1,8 @@
 package dev.oop778.shelftor.core.shelf.expiring;
 
 import dev.oop778.shelftor.api.expiring.policy.ExpiringPolicy;
-import dev.oop778.shelftor.api.store.expiring.ExpiringShelf;
-import dev.oop778.shelftor.api.store.expiring.ExpiringShelfBuilder;
+import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
+import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelfBuilder;
 import dev.oop778.shelftor.core.shelf.CoreShelfBuilder;
 
 public class CoreExpiringShelfBuilder<T> extends CoreShelfBuilder<T, CoreExpiringShelfBuilder<T>> implements ExpiringShelfBuilder<T, CoreExpiringShelfBuilder<T>> {

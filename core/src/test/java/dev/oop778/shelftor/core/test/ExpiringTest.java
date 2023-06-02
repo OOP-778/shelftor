@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dev.oop778.shelftor.api.expiring.policy.implementation.TimedExpiringPolicy;
 import dev.oop778.shelftor.api.query.Query;
-import dev.oop778.shelftor.api.store.Shelf;
-import dev.oop778.shelftor.api.store.expiring.ExpiringShelf;
+import dev.oop778.shelftor.api.shelf.Shelf;
+import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
 import dev.oop778.shelftor.core.test.helper.TestBase;
 import dev.oop778.shelftor.core.test.helper.data.Student;
 import java.util.Collection;

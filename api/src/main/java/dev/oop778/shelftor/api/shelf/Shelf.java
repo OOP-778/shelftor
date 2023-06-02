@@ -1,4 +1,4 @@
-package dev.oop778.shelftor.api.store;
+package dev.oop778.shelftor.api.shelf;
 
 import dev.oop778.shelftor.api.Shelftor;
 import dev.oop778.shelftor.api.index.Indexable;
