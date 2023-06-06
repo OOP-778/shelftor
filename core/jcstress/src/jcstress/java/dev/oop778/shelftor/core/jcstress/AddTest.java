@@ -4,13 +4,16 @@ import static org.openjdk.jcstress.annotations.Expect.ACCEPTABLE;
 
 import dev.oop778.shelftor.api.shelf.Shelf;
 import dev.oop778.shelftor.core.CoreShelftor;
+import dev.oop778.shelftor.core.jcstress.TestObject;
 import org.openjdk.jcstress.annotations.Actor;
+import org.openjdk.jcstress.annotations.JCStressTest;
 import org.openjdk.jcstress.annotations.Outcome;
 import org.openjdk.jcstress.annotations.State;
 import org.openjdk.jcstress.infra.results.ZZ_Result;
 
-@Outcome(id = "true, false", expect = ACCEPTABLE, desc = "Yes")
-@Outcome(id = "false, true", expect = ACCEPTABLE, desc = "Yes")
+//Outcome(id = {"true, false"}, expect = ACCEPTABLE, desc = "Yes")
+//@Outcome(id = {"false, true"}, expect = ACCEPTABLE, desc = "Yes")
+//@JCStressTest
 public class AddTest {
 
     @State

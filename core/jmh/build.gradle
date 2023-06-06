@@ -1,11 +1,11 @@
 plugins {
-    id("me.champeau.jmh") version("0.6.6")
+    id("me.champeau.jmh") version("0.7.1")
 }
 
 dependencies {
     jmhImplementation(project(":api"))
     jmhImplementation(project(":core"))
-    jmh(libs.jmh.core)
+    //jmh(libs.jmh.core)
     jmhAnnotationProcessor(libs.jmh.annotationprocessor)
     jmhAnnotationProcessor(libs.lombok)
     jmhImplementation("com.oop:memory-store:latest.integration")

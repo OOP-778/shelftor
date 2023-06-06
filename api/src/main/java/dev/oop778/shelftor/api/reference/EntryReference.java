@@ -9,6 +9,10 @@ public interface EntryReference<T> {
 
     boolean isIdentity();
 
+    default boolean isMarked() {
+        return false;
+    }
+
     static <T> EntryReference<T> hashableWeak(T value) {
         return weak(value, false, null);
     }

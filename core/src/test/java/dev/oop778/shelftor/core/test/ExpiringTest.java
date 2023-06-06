@@ -1,5 +1,7 @@
 package dev.oop778.shelftor.core.test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dev.oop778.shelftor.api.expiring.policy.implementation.TimedExpiringPolicy;
@@ -53,5 +55,28 @@ class ExpiringTest extends TestBase {
         store.invalidate();
 
         assertTrue(store.isEmpty(), "Store not empty");
+    }
+
+    @Test
+    @SneakyThrows
+    void resettingTimedPolicyAndThenExpiring() {
+        final Student student = Student.dummy();
+
+        final ExpiringShelf<Student> store = Shelf.<Student>builder()
+            .expiring()
+            .usePolicy(TimedExpiringPolicy.create(50, TimeUnit.MILLISECONDS, true))
+            .build();
+        initBaseIndexes(store);
+
+        store.add(student);
+
+        TimeUnit.MILLISECONDS.sleep(30);
+        store.getFirst(Query.where("id", student.getId()));
+
+        TimeUnit.MILLISECONDS.sleep(30);
+        assertNotNull(store.getFirst(Query.where("id", student.getId())), "Store empty");
+
+        TimeUnit.MILLISECONDS.sleep(90);
+        assertNull(store.getFirst(Query.where("id", student.getId())), "Store not empty");
     }
 }

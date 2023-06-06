@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class CoreWeakEntryReference<T> extends WeakReference<T> implements EntryReference<T> {
     private final CoreRererenceProps<T> props;
+    private volatile boolean marked;
 
     public CoreWeakEntryReference(@Nullable CoreWeakReferenceQueue<T> queue, T referent, boolean identity) {
         super(referent, queue);
@@ -19,11 +20,17 @@ public class CoreWeakEntryReference<T> extends WeakReference<T> implements Entry
     }
 
     @Override
+    public boolean isMarked() {
+        return this.marked;
+    }
+
+    @Override
     public boolean dispose() {
         if (this.get() == null) {
             return false;
         }
 
+        this.marked = true;
         super.enqueue();
         super.clear();
 

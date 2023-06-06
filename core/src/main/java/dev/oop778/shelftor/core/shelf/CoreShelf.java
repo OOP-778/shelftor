@@ -1,24 +1,24 @@
 package dev.oop778.shelftor.core.shelf;
 
+import dev.oop778.shelftor.api.index.IndexDefinition;
+import dev.oop778.shelftor.api.index.ShelfIndex;
+import dev.oop778.shelftor.api.query.Query;
+import dev.oop778.shelftor.api.reference.EntryReference;
+import dev.oop778.shelftor.api.shelf.Shelf;
+import dev.oop778.shelftor.core.index.CoreShelfIndex;
+import dev.oop778.shelftor.core.index.IndexManager;
 import dev.oop778.shelftor.core.query.CoreQuery;
 import dev.oop778.shelftor.core.query.CoreQuery.Operator;
+import dev.oop778.shelftor.core.reference.CoreReferenceManager;
+import dev.oop778.shelftor.core.util.collection.Collections;
 import dev.oop778.shelftor.core.util.collection.ListenableCollection;
 import dev.oop778.shelftor.core.util.collection.ReferencedCollection;
-import dev.oop778.shelftor.api.shelf.Shelf;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import lombok.NonNull;
-import dev.oop778.shelftor.api.index.IndexDefinition;
-import dev.oop778.shelftor.api.index.ShelfIndex;
-import dev.oop778.shelftor.api.query.Query;
-import dev.oop778.shelftor.api.reference.EntryReference;
-import dev.oop778.shelftor.core.index.IndexManager;
-import dev.oop778.shelftor.core.index.CoreShelfIndex;
-import dev.oop778.shelftor.core.reference.CoreReferenceManager;
-import dev.oop778.shelftor.core.util.collection.Collections;
 import org.jetbrains.annotations.Nullable;
 
 public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
@@ -46,14 +46,6 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
         return new CoreShelfBuilder<>();
     }
 
-    public CoreShelfSettings getSettings() {
-        return this.settings;
-    }
-
-    public CoreReferenceManager<T> getReferenceManager() {
-        return this.referenceManager;
-    }
-
     @Override
     public boolean add(T t) {
         this.referenceManager.runRemoveQueue();
@@ -66,10 +58,10 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
         final boolean result = super.remove(o);
 
         if (result) {
-            this.referenceManager.releaseReference((T) o);
+            return this.referenceManager.releaseReference((T) o);
         }
 
-        return result;
+        return false;
     }
 
     @Override
@@ -92,14 +84,35 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
         return this._get(query, limit);
     }
 
+    @Override
+    public Collection<T> remove(Query query) {
+        final Collection<T> toRemove = this.get(query);
+        for (final T value : new HashSet<>(toRemove)) {
+            this.remove(value);
+        }
+
+        return toRemove;
+    }
+
+    public CoreShelfSettings getSettings() {
+        return this.settings;
+    }
+
+    public CoreReferenceManager<T> getReferenceManager() {
+        return this.referenceManager;
+    }
+
     protected ReferencedCollection<T> _get(@NonNull Query query, int limit) {
         this.referenceManager.runRemoveQueue();
 
         final CoreQuery rootQuery = (CoreQuery) query;
-        return this.fetch(rootQuery);
+        return this.fetch(rootQuery, true);
     }
 
-    private ReferencedCollection<T> fetch(CoreQuery query) {
+    protected void postFetch(Collection<T> result) {
+    }
+
+    private ReferencedCollection<T> fetch(CoreQuery query, boolean root) {
         if (query.isInitialized() && query.getQueries().isEmpty()) {
             return this.fetchSingle(query);
         }
@@ -114,7 +127,7 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
         final Collection<EntryReference<T>> result = new LinkedHashSet<>();
 
         for (final CoreQuery singleQuery : fetchFrom) {
-            final ReferencedCollection<T> fetch = this.fetch(singleQuery);
+            final ReferencedCollection<T> fetch = this.fetch(singleQuery, false);
             if (query.getOperator() == Operator.AND && fetch.isEmpty()) {
                 return fetch;
             }
@@ -135,6 +148,10 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
         final ReferencedCollection<T> finalCollection = new ReferencedCollection<>(result, null);
         finalCollection.setFetcher(this.referenceManager::createFetchingReference);
 
+        if (root) {
+            this.postFetch(finalCollection);
+        }
+
         return finalCollection;
     }
 
@@ -144,20 +161,9 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
             throw new IllegalStateException(String.format("Invalid index by name `%s`", query.getIndex()));
         }
 
-        return index.get(query.getValue());
-    }
+        final ReferencedCollection<T> finalCollection = index.get(query.getValue());
+        this.postFetch(finalCollection);
 
-    @Override
-    public Collection<T> remove(Query query) {
-        final Collection<T> toRemove = this.get(query);
-        for (final T value : new HashSet<>(toRemove)) {
-            this.remove(value);
-        }
-
-        return toRemove;
-    }
-
-    protected void onAccess(EntryReference<T> reference) {
-
+        return finalCollection;
     }
 }

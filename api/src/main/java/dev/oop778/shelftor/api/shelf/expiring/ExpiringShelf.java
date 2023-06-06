@@ -8,7 +8,7 @@ public interface ExpiringShelf<T> extends Shelf<T> {
 
     ExpiringShelfSettings<T> getSettings();
 
-    void invalidate();
+    int invalidate();
 
     Closeable onExpire(@NonNull ExpirationHandler<T> handler);
 

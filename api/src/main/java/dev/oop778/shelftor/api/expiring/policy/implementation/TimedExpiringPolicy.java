@@ -31,7 +31,8 @@ public class TimedExpiringPolicy<T> implements ExpiringPolicyWithData<T, TimedEx
 
     @Override
     public boolean shouldExpire(final T value, final TimedExpirationData data) {
-        return (System.currentTimeMillis() - data.lastFetched) >= data.unit.toMillis(data.time);
+        final long elapsed = System.currentTimeMillis() - data.lastFetched;
+        return elapsed >= data.unit.toMillis(data.time);
     }
 
     @Override

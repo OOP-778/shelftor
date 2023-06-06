@@ -1,12 +1,11 @@
 plugins {
-    id("io.github.reyerizo.gradle.jcstress") version "0.8.13"
+    id("io.github.reyerizo.gradle.jcstress") version "0.8.15"
 }
 
 dependencies {
     jcstressImplementation(project(":api"))
     jcstressImplementation(project(":core"))
     jcstressAnnotationProcessor(libs.lombok)
-    jcstress(libs.jcstress.core)
 }
 
 java {

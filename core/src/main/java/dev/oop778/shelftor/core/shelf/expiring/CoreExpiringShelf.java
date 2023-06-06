@@ -1,13 +1,11 @@
 package dev.oop778.shelftor.core.shelf.expiring;
 
 import dev.oop778.shelftor.api.expiring.policy.ExpiringPolicyWithData;
-import dev.oop778.shelftor.api.query.Query;
 import dev.oop778.shelftor.api.reference.EntryReference;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
 import dev.oop778.shelftor.api.util.Closeable;
 import dev.oop778.shelftor.core.expiring.ExpirationManager;
 import dev.oop778.shelftor.core.shelf.CoreShelf;
-import dev.oop778.shelftor.core.util.collection.ReferencedCollection;
 import dev.oop778.shelftor.core.util.log.LogDebug;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,7 +23,8 @@ public class CoreExpiringShelf<T> extends CoreShelf<T> implements ExpiringShelf<
         this.globalExpirationListeners = settings.isConcurrent() ? new LinkedHashSet<>() : new HashSet<>();
         this.expirationManager = new ExpirationManager<>(this);
         this.needsAccessCalls = settings.expiringPolicies()
-            .stream().anyMatch((policy) -> {
+            .stream()
+            .anyMatch((policy) -> {
                 if (!(policy instanceof ExpiringPolicyWithData)) {
                     return false;
                 }
@@ -35,10 +34,17 @@ public class CoreExpiringShelf<T> extends CoreShelf<T> implements ExpiringShelf<
     }
 
     @Override
-    public void invalidate() {
+    public int invalidate() {
+        this.referenceManager.runRemoveQueue();
+
+        int removed = 0;
         for (final EntryReference<T> reference : this.referenceManager.getReferenceMap().values()) {
-            this.checkup(reference);
+            if (this.tryExpire(reference)) {
+                removed++;
+            }
         }
+
+        return removed;
     }
 
     @Override
@@ -47,13 +53,19 @@ public class CoreExpiringShelf<T> extends CoreShelf<T> implements ExpiringShelf<
         return () -> this.globalExpirationListeners.remove(handler);
     }
 
-    protected void checkup(EntryReference<T> reference) {
+    protected boolean tryExpire(EntryReference<T> reference) {
+        if (reference.isMarked()) {
+            return false;
+        }
+
         if (this.expirationManager.shouldExpire(reference)) {
             this.globalExpirationListeners.forEach((handler) -> handler.onExpire(reference.get()));
 
-            LogDebug.log("[ExpiringStore]: Expiring reference: " + reference.get());
-            this.referenceManager.releaseReference(reference);
+            LogDebug.log("Expiring reference: " + reference.get());
+            return this.referenceManager.releaseReference(reference);
         }
+
+        return false;
     }
 
     @Override
@@ -62,14 +74,20 @@ public class CoreExpiringShelf<T> extends CoreShelf<T> implements ExpiringShelf<
     }
 
     @Override
-    protected ReferencedCollection<T> _get(@NonNull Query query, int limit) {
-        final ReferencedCollection<T> result = super._get(query, limit);
-        if (this.needsAccessCalls) {
-            for (final EntryReference<T> reference : result.getBacking()) {
-                this.checkup(reference);
+    protected void postFetch(Collection<T> result) {
+        for (final T value : result) {
+            final EntryReference<T> fetchingReference = this.referenceManager.getRealReference(value);
+            if (fetchingReference == null) {
+                continue;
+            }
+
+            if (this.tryExpire(fetchingReference)) {
+                continue;
+            }
+
+            if (this.needsAccessCalls) {
+                this.referenceManager.callReferenceAccess(fetchingReference);
             }
         }
-
-        return result;
     }
 }

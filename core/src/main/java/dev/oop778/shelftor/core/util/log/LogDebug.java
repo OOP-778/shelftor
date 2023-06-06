@@ -15,8 +15,11 @@ public class LogDebug {
         final Deque<StackTraceElement> stackTraceElements = collectStack();
         final StackTraceElement pop = stackTraceElements.pop();
 
+        final String[] split = pop.getClassName().split("\\.");
+        final String simpleName = split[split.length - 1];
+
         System.out.printf("[%s]: %s%n",
-            String.format("%s#%s", pop.getClassName(), pop.getMethodName()),
+            String.format("%s#%s", simpleName, pop.getMethodName()),
             String.format(message, args)
         );
     }

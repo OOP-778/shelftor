@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 public interface ReferenceManager<T> {
     EntryReference<T> getOrCreateReference(@NonNull T value);
 
-    void releaseReference(@NonNull EntryReference<T> reference);
+    boolean releaseReference(@NonNull EntryReference<T> reference);
 
-    void releaseReference(@NonNull T value);
+    boolean releaseReference(@NonNull T value);
 
     // Create a fetching reference
     // No matter if it's weak or not, it will return strong either hashable or not

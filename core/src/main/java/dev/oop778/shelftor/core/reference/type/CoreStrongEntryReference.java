@@ -1,18 +1,26 @@
 package dev.oop778.shelftor.core.reference.type;
 
-import java.util.concurrent.atomic.AtomicReference;
 import dev.oop778.shelftor.api.reference.EntryReference;
 import dev.oop778.shelftor.core.reference.queue.CoreSimpleReferenceQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class CoreStrongEntryReference<T> implements EntryReference<T>, EntryReference.ListenableDisposable {
     private final AtomicReference<T> referentReference;
     private final CoreRererenceProps<T> props;
     private final CoreSimpleReferenceQueue<T> queue;
+    private final AtomicBoolean marked;
 
     public CoreStrongEntryReference(CoreSimpleReferenceQueue<T> queue, T referent, boolean identity) {
         this.referentReference = new AtomicReference<>(referent);
         this.props = new CoreRererenceProps<>(identity, referent);
         this.queue = queue;
+        this.marked = new AtomicBoolean();
+    }
+
+    @Override
+    public void postListenDispose() {
+        this.referentReference.set(null);
     }
 
     @Override
@@ -21,19 +29,23 @@ public class CoreStrongEntryReference<T> implements EntryReference<T>, EntryRefe
     }
 
     @Override
-    public boolean dispose() {
-        if (this.get() == null) {
+    public synchronized boolean dispose() {
+        if (!this.marked.compareAndSet(false, true)) {
             return false;
         }
 
         this.queue.safeOffer(this);
-
         return true;
     }
 
     @Override
     public boolean isIdentity() {
         return this.props.isIdentity();
+    }
+
+    @Override
+    public boolean isMarked() {
+        return this.marked.get();
     }
 
     @Override
@@ -54,8 +66,7 @@ public class CoreStrongEntryReference<T> implements EntryReference<T>, EntryRefe
         return this.props.getHashCode();
     }
 
-    @Override
-    public void postListenDispose() {
-        this.referentReference.set(null);
+    public CoreSimpleReferenceQueue<T> getQueue() {
+        return this.queue;
     }
 }

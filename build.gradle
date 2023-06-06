@@ -1,11 +1,11 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group 'dev.oop778.shelftor'
-version '0.0.1'
+version '0.0.2'
 
 repositories {
     mavenCentral()
@@ -32,6 +32,8 @@ subprojects {
         testAnnotationProcessor(libs.lombok)
     }
 
+
+
     if (!project.name.contains("jmh") && !project.name.contains("jcstress")) {
         tasks {
             shadowJar {
@@ -51,7 +53,8 @@ subprojects {
 
             publications {
                 register("mavenJava", MavenPublication.class) {
-                    artifact(file("out/shelftor-${project.name}.jar"))
+                    project.shadow.component(it)
+                   // artifact(file(rootDir.toString() + File.separator + "out" + File.separator + "shelftor-${project.name}.jar"))
 
                     groupId("dev.oop778.shelftor")
                     artifactId("shelftor-${project.name}")

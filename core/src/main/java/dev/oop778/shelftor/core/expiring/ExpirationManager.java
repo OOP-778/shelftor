@@ -28,7 +28,6 @@ public class ExpirationManager<T> extends CloseableHolder {
 
         // Handle removing of references
         this.addCloseable(referenceManager.onReferenceRemove((reference) -> {
-            LogDebug.log("Reference removed: " + reference.get());
             this.expirationData.remove(reference.hashCode());
         }));
 
@@ -56,6 +55,8 @@ public class ExpirationManager<T> extends CloseableHolder {
 
         // Handle access if any policies require it
         this.addCloseable(referenceManager.onReferenceAccess((reference) -> {
+            LogDebug.log("Reference accessed: " + reference.get());
+
             final List<? extends ExpiringPolicyWithData<T, ?>> policies = this.settings.expiringPolicies()
                 .stream()
                 .map((policy) -> policy instanceof ExpiringPolicyWithData ? (ExpiringPolicyWithData<T, ?>) policy : null)
@@ -64,6 +65,8 @@ public class ExpirationManager<T> extends CloseableHolder {
                 .collect(Collectors.toList());
 
             final Map<Class<?>, Object> policyToData = this.expirationData.get(reference.hashCode());
+
+            LogDebug.log("Calling on access with %s policies", policies.size());
 
             for (final ExpiringPolicyWithData policy : policies) {
                 policy.onAccess(reference.get(), policyToData.get(policy.getClass()));
@@ -81,6 +84,7 @@ public class ExpirationManager<T> extends CloseableHolder {
                 if (((ExpiringPolicyWithData) expiringPolicy).shouldExpire(reference.get(), expirationData)) {
                     shouldExpire = true;
                 }
+
                 continue;
             }
 

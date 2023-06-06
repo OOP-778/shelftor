@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import dev.oop778.shelftor.api.query.Query;
+import lombok.ToString;
 
+@ToString
 public class CoreQuery implements Query {
     private String index;
     private Object value;
