@@ -52,6 +52,10 @@ public class CoreShelfIndex<T, K> extends CloseableHolder implements ShelfIndex<
 
         optionalLocking.locking(() -> {
             try {
+                if (reference.isMarked()) {
+                    return;
+                }
+
                 final T value = reference.get();
 
                 // Reference been removed ;)

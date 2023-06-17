@@ -1,15 +1,20 @@
 package dev.oop778.shelftor.core.index;
 
-import dev.oop778.shelftor.core.shelf.CoreShelf;
-import dev.oop778.shelftor.core.util.closeable.CloseableHolder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.NonNull;
 import dev.oop778.shelftor.api.index.IndexDefinition;
 import dev.oop778.shelftor.api.index.Indexable;
 import dev.oop778.shelftor.api.index.ShelfIndex;
+import dev.oop778.shelftor.api.reference.EntryReference;
 import dev.oop778.shelftor.api.util.Closeable;
+import dev.oop778.shelftor.core.shelf.CoreShelf;
+import dev.oop778.shelftor.core.util.closeable.CloseableHolder;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IndexManager<T> extends CloseableHolder implements Indexable<T> {
@@ -41,5 +46,22 @@ public class IndexManager<T> extends CloseableHolder implements Indexable<T> {
     @Nullable
     public <K> CoreShelfIndex<T, K> getIndex(@NonNull String index) {
         return (CoreShelfIndex<T, K>) this.indexes.get(index);
+    }
+
+    @Override
+    public <K> Map<String, ShelfIndex<T, K>> getIndexes() {
+        return Collections.unmodifiableMap((Map<String, ShelfIndex<T, K>>) (Map) this.indexes);
+    }
+
+    @Override
+    public void reindex(@NonNull T value, @NonNull Collection<String> indexNames) {
+        final EntryReference<T> entityReference = this.store.getReferenceManager().getRealReference(value);
+        if (entityReference == null) {
+            return;
+        }
+
+        indexNames.stream().map(this::getIndex)
+            .filter(Objects::nonNull)
+            .forEach((index) -> index.index(entityReference));
     }
 }

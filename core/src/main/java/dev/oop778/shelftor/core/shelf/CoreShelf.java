@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,6 +81,16 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
     }
 
     @Override
+    public void reindex(@NonNull T value, @NonNull Collection<String> indexNames) {
+        this.indexManager.reindex(value, indexNames);
+    }
+
+    @Override
+    public <K> Map<String, ShelfIndex<T, K>> getIndexes() {
+        return this.indexManager.getIndexes();
+    }
+
+    @Override
     public Collection<T> get(@NonNull Query query, int limit) {
         return this._get(query, limit);
     }
@@ -100,6 +111,10 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
 
     public CoreReferenceManager<T> getReferenceManager() {
         return this.referenceManager;
+    }
+
+    public IndexManager<T> getIndexManager() {
+        return this.indexManager;
     }
 
     protected ReferencedCollection<T> _get(@NonNull Query query, int limit) {
