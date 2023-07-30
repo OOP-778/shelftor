@@ -5,7 +5,6 @@ plugins {
 dependencies {
     jmhImplementation(project(":api"))
     jmhImplementation(project(":core"))
-    //jmh(libs.jmh.core)
     jmhAnnotationProcessor(libs.jmh.annotationprocessor)
     jmhAnnotationProcessor(libs.lombok)
     jmhImplementation("com.oop:memory-store:latest.integration")

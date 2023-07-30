@@ -1,66 +1,47 @@
+import dev.oop778.gradle.common.CommonExtension
+import dev.oop778.gradle.common.CommonPlugin
+import dev.oop778.gradle.common.HierarchyProjectName
+
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
-    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-group 'dev.oop778.shelftor'
-version '0.0.2'
+apply plugin: CommonPlugin
 
-repositories {
-    mavenCentral()
+common {
+    applyCommonToAllProjects()
 }
 
-subprojects {
+allprojects {
+    if (project == project.rootProject) {
+        return
+    }
+
     apply {
-        plugin("java")
-        plugin("com.github.johnrengelman.shadow")
-        plugin("maven-publish")
+        plugin("java-library")
+        plugin("signing")
+    }
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    extensions.findByType(CommonExtension.class)?.with {
+        createPublicationFrom(components.java, HierarchyProjectName.get(project))
     }
 
     repositories {
         mavenCentral()
-        maven { setUrl("https://repo.codemc.io/repository/maven-public/") }
     }
 
     dependencies {
+        compileOnlyApi(libs.jetbrainsAnnotations)
         compileOnly(libs.lombok)
-        compileOnly(libs.jetbrainsAnnotations)
         annotationProcessor(libs.lombok)
 
         testImplementation(libs.lombok)
         testAnnotationProcessor(libs.lombok)
-    }
-
-
-
-    if (!project.name.contains("jmh") && !project.name.contains("jcstress")) {
-        tasks {
-            shadowJar {
-                finalizedBy(publish)
-                archiveFileName = "shelftor-${project.name}.jar"
-                destinationDirectory = file(rootDir.toString() + File.separator + "out")
-            }
-
-            build.dependsOn(shadowJar)
-            build.dependsOn(publish)
-        }
-
-        publishing {
-            repositories {
-                mavenLocal()
-            }
-
-            publications {
-                register("mavenJava", MavenPublication.class) {
-                    project.shadow.component(it)
-                   // artifact(file(rootDir.toString() + File.separator + "out" + File.separator + "shelftor-${project.name}.jar"))
-
-                    groupId("dev.oop778.shelftor")
-                    artifactId("shelftor-${project.name}")
-                    version(rootProject.version.toString())
-                }
-            }
-        }
     }
 }

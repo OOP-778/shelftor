@@ -4,32 +4,10 @@ metadata.format.version = "1.1"
 jetbrainsAnnotations = "23.0.0"
 lombok = "1.18.22"
 
-# Performance / Data Structures
-caffeine = "3.0.6"
-fastutil = "8.5.8"
-flare = "2.0.1"
-
 # JMH
 jmh = "1.35"
 
-# JCStress
-jcstress = "0.8"
-
 [libraries]
-
-# Miscellaneous
 jetbrainsAnnotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrainsAnnotations" }
 lombok = { group="org.projectlombok", name = "lombok", version.ref="lombok" }
-
-# Performance / Data Structures
-caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
-fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
-flare = { group = "space.vectrix.flare", name = "flare", version.ref = "flare" }
-flare-fastutil = { group = "space.vectrix.flare", name = "flare-fastutil", version.ref = "flare" }
-
-# JMH
-jmh-core = { group = "org.openjdk.jmh", name = "jmh-core", version.ref = "jmh" }
 jmh-annotationprocessor = { group = "org.openjdk.jmh", name = "jmh-generator-annprocess", version.ref = "jmh" }
-
-# JCStress
-jcstress-core = { group = "org.openjdk.jcstress", name = "jcstress-core", version.ref = "jcstress" }
