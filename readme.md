@@ -10,7 +10,8 @@ It can be also used in other scenarios where you need to store data by indexes a
 This is a complete recode of previously forked [memory-store](https://github.com/OOP-778/memory-store)
 
 ## Usage
-Shelftor is hosted at maven central to add it to your dependencies follow the guide depending on your build tool
+Shelftor is hosted at maven central.   
+To add it to your dependencies follow the guide depending on your build tool
 ### Maven
 ```maven
  <dependency>
