@@ -7,6 +7,8 @@
 This library gives you in memory database that you can use as a cache layer between db -> application  
 It can be also used in other scenarios where you need to store data by indexes and retrieve it by them.
 
+This is a complete recode of previously forked [memory-store](https://github.com/OOP-778/memory-store)
+
 ## Usage
 ### Queries
 Shelftor comes with a very powerful querying system, it gives you the flexibility to adapt to any database. And can be used a query 
@@ -45,11 +47,11 @@ Shelf.<User>builder()
 Shelf.<User>builder().expiring()
     // All options from the default shelf are available here
     // By default shelftor expiring shelfs do expiration when you fetch values from it, but you can change that to be done in a 
-    background thread
+    // background thread
     .expireCheckInterval(long interval, TimeUnit unit)
     // You need to define expiring policies for values to be expired
     // Wel'll talk about expiring policies later
-    .usePolicy(ExpiringPolicy)
+    .usePolicy(ExpiringPolicy policy)
 ```
 
 #### Expiring Policies
@@ -61,9 +63,43 @@ whilst `ExpiringPolicyWithData` stores data on the values to know when to expire
 Example of that is `TimedExpiringPolicy` located at `api/src/main/java/dev/oop778/shelftor/api/expiring/policy/implementation/TimedExpiringPolicy`
 
 
-### Defining Indexes
+### Indexes
 You can define indexes of two types collection and single
-// TODO
+Let's say we have a Student object that has name (String) & grades (Collection<Integer>)
+
+```java
+record Student(String name, Collection<Integer> grades) {}
+
+// Now let's create a shelf for students
+Shelf<Student> shelf = Shelf.<Student>builder()
+    .build();
+
+// Now let's define an index for name
+shelf.index("name", Student::name);
+
+// Now let's define an index for grades
+shelf.index("grades", IndexDefinition.withKeyMappings(Student::getGrades))
+
+// Now let's create two stdudents
+Student student = new Student("OOP_778", List.of(5, 6, 7));
+Student student2 = new Student("OOP_779", List.of(5, 6, 7));
+
+// Now let's put them in the shelf
+shelf.add(student);
+shelf.add(student2);
+
+// Now we can fetch them by grade of 5
+shelf.get("grades", 5); // This returns us both students
+
+// Now let's say one student grades changes
+student.grades().add(8);
+
+// We need to reindex that student
+shelf.reindex(student, "grades");
+
+// That's it, now you should be able to properly understand the full power of shelftor
+
+```
 
 ### Shelf Diagram
 ![Shelf Diagram](img/shelf_diagram.png)
