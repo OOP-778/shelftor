@@ -1,5 +1,5 @@
 # Shelftor
-![Maven Central](https://img.shields.io/maven-central/v/dev.oop778.shelftor/shelftor-api)
+![Maven Central](https://img.shields.io/maven-central/v/dev.oop778.shelftor/shelftor-core)
 ![Static Badge](https://img.shields.io/badge/java_version-8--latest-brightgreen)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/OOP-778/shelftor)
 
