@@ -10,6 +10,20 @@ It can be also used in other scenarios where you need to store data by indexes a
 This is a complete recode of previously forked [memory-store](https://github.com/OOP-778/memory-store)
 
 ## Usage
+Shelftor is hosted at maven central to add it to your dependencies follow the guide depending on your build tool
+### Maven
+```maven
+ <dependency>
+    <groupId>dev.oop778.shelftor/groupId>
+    <artifactId>shelftor-api/shelftor-core</artifactId>
+    <version><version></version>
+ </dependency>
+```
+### Gradle
+```gradle
+implementation 'dev.oop778.shelftor:shelftor-api/shelftor-core:<version>'
+```
+
 ### Queries
 Shelftor comes with a very powerful querying system, it gives you the flexibility to adapt to any database. And can be used a query 
 system for database of your use with some adaptation.
