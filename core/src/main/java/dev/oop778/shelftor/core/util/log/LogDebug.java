@@ -3,6 +3,7 @@ package dev.oop778.shelftor.core.util.log;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.function.Supplier;
 
 public class LogDebug {
     public static boolean DEBUG = false;
@@ -18,7 +19,8 @@ public class LogDebug {
         final String[] split = pop.getClassName().split("\\.");
         final String simpleName = split[split.length - 1];
 
-        System.out.printf("[%s]: %s%n",
+        System.out.printf("[%s] [%s]: %s%n",
+            System.nanoTime(),
             String.format("%s#%s", simpleName, pop.getMethodName()),
             String.format(message, args)
         );
