@@ -5,8 +5,10 @@ import dev.oop778.shelftor.api.expiring.policy.ExpiringPolicyWithData;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import dev.oop778.shelftor.api.expiring.policy.implementation.TimedExpiringPolicy.TimedExpirationData;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+@ToString
 public class TimedExpiringPolicy<T> implements ExpiringPolicyWithData<T, TimedExpirationData> {
     private final boolean shouldCallOnAccess;
     private final Function<T, TimedExpirationData> expirationDataFunction;

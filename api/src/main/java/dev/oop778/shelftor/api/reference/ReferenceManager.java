@@ -1,11 +1,12 @@
 package dev.oop778.shelftor.api.reference;
 
+import dev.oop778.shelftor.api.dumpable.Dumpable;
 import dev.oop778.shelftor.api.util.Closeable;
 import java.util.function.Consumer;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 
-public interface ReferenceManager<T> {
+public interface ReferenceManager<T> extends Dumpable {
     EntryReference<T> getOrCreateReference(@NonNull T value);
 
     boolean releaseReference(@NonNull EntryReference<T> reference);

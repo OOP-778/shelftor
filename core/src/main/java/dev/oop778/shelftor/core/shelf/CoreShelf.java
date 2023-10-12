@@ -8,7 +8,6 @@ import dev.oop778.shelftor.api.shelf.Shelf;
 import dev.oop778.shelftor.core.index.CoreShelfIndex;
 import dev.oop778.shelftor.core.index.IndexManager;
 import dev.oop778.shelftor.core.query.CoreQuery;
-import dev.oop778.shelftor.core.query.CoreQuery.Operator;
 import dev.oop778.shelftor.core.reference.CoreReferenceManager;
 import dev.oop778.shelftor.core.util.collection.Collections;
 import dev.oop778.shelftor.core.util.collection.ListenableCollection;
@@ -19,9 +18,11 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+@Getter
 public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
     protected final CoreShelfSettings settings;
     protected final CoreReferenceManager<T> referenceManager;
@@ -105,16 +106,16 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
         return toRemove;
     }
 
-    public CoreShelfSettings getSettings() {
-        return this.settings;
+    @Override
+    public void dump(Collection<String> lines) {
+        lines.add("== Shelf ==");
+        this.settings.dump(lines);
+        this.referenceManager.dump(lines);
     }
 
-    public CoreReferenceManager<T> getReferenceManager() {
-        return this.referenceManager;
-    }
-
-    public IndexManager<T> getIndexManager() {
-        return this.indexManager;
+    @Override
+    public String toString() {
+        return this.backing.toString();
     }
 
     protected ReferencedCollection<T> _get(@NonNull Query query, int limit) {
@@ -143,11 +144,11 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
 
         for (final CoreQuery singleQuery : fetchFrom) {
             final ReferencedCollection<T> fetch = this.fetch(singleQuery, false);
-            if (query.getOperator() == Operator.AND && fetch.isEmpty()) {
+            if (query.getOperator() == CoreQuery.Operator.AND && fetch.isEmpty()) {
                 return fetch;
             }
 
-            if (query.getOperator() == Operator.AND) {
+            if (query.getOperator() == CoreQuery.Operator.AND) {
                 if (result.isEmpty()) {
                     result.addAll(fetch.getBacking());
                 } else {
@@ -155,7 +156,7 @@ public class CoreShelf<T> extends ListenableCollection<T> implements Shelf<T> {
                 }
             }
 
-            if (query.getOperator() == Operator.OR) {
+            if (query.getOperator() == CoreQuery.Operator.OR) {
                 result.addAll(fetch.getBacking());
             }
         }

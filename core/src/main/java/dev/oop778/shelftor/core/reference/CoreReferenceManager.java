@@ -1,7 +1,6 @@
 package dev.oop778.shelftor.core.reference;
 
 import dev.oop778.shelftor.api.reference.EntryReference;
-import dev.oop778.shelftor.api.reference.EntryReference.ListenableDisposable;
 import dev.oop778.shelftor.api.reference.EntryReferenceQueue;
 import dev.oop778.shelftor.api.reference.ReferenceManager;
 import dev.oop778.shelftor.api.util.Closeable;
@@ -18,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +26,7 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
     private final CoreShelfSettings settings;
     private final Function<T, EntryReference<T>> referenceFactory;
     private final EntryReferenceQueue<T> referenceQueue;
+    @Getter
     private final Map<Integer, EntryReference<T>> referenceMap;
     private final Collection<Consumer<EntryReference<T>>> removeListeners;
     private final Collection<Consumer<EntryReference<T>>> addListeners;
@@ -108,6 +109,15 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
         return this.settings.isHashable() ? value.hashCode() : System.identityHashCode(value);
     }
 
+    @Override
+    public void dump(Collection<String> lines) {
+        lines.add("== ReferenceManager ==");
+        lines.add("References = " + this.referenceMap.size());
+        lines.add("Remove listeners = " + this.removeListeners.size());
+        lines.add("Add listeners = " + this.addListeners.size());
+        lines.add("Access listeners = " + this.accessListeners.size());
+    }
+
     public void callReferenceAccess(EntryReference<T> reference) {
         LogDebug.log("Calling reference access");
         this.accessListeners.forEach((listener) -> listener.accept(reference));
@@ -133,12 +143,8 @@ public class CoreReferenceManager<T> implements ReferenceManager<T> {
 
             LogDebug.log("Removed reference: %s", finalReference);
             if (finalReference instanceof EntryReference.ListenableDisposable) {
-                ((ListenableDisposable) finalReference).postListenDispose();
+                ((EntryReference.ListenableDisposable) finalReference).postListenDispose();
             }
         }
-    }
-
-    public Map<Integer, EntryReference<T>> getReferenceMap() {
-        return this.referenceMap;
     }
 }

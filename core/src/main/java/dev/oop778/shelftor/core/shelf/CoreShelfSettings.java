@@ -1,7 +1,8 @@
 package dev.oop778.shelftor.core.shelf;
 
-import lombok.ToString;
 import dev.oop778.shelftor.api.shelf.ShelfSettings;
+import java.util.Collection;
+import lombok.ToString;
 
 @ToString
 public class CoreShelfSettings implements ShelfSettings {
@@ -20,6 +21,10 @@ public class CoreShelfSettings implements ShelfSettings {
         this.weak = settings.isWeak();
     }
 
+    public static CoreShelfSettings create() {
+        return new CoreShelfSettings(false, false);
+    }
+
     @Override
     public boolean isConcurrent() {
         return this.concurrent;
@@ -35,19 +40,23 @@ public class CoreShelfSettings implements ShelfSettings {
         return this.weak;
     }
 
-    public void setConcurrent(boolean concurrent) {
-        this.concurrent = concurrent;
+    public void setWeak(boolean weak) {
+        this.weak = weak;
     }
 
     public void setHashable(boolean hashable) {
         this.hashable = hashable;
     }
 
-    public void setWeak(boolean weak) {
-        this.weak = weak;
+    public void setConcurrent(boolean concurrent) {
+        this.concurrent = concurrent;
     }
 
-    public static CoreShelfSettings create() {
-        return new CoreShelfSettings(false, false);
+    @Override
+    public void dump(Collection<String> lines) {
+        lines.add("== Settings ==");
+        lines.add("concurrent = " + this.concurrent);
+        lines.add("hashable = " + this.hashable);
+        lines.add("weak = " + this.weak);
     }
 }

@@ -2,6 +2,7 @@ package dev.oop778.shelftor.core.reference.type;
 
 import dev.oop778.shelftor.api.reference.EntryReference;
 import dev.oop778.shelftor.core.reference.queue.CoreSimpleReferenceQueue;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -29,7 +30,7 @@ public class CoreStrongEntryReference<T> implements EntryReference<T>, EntryRefe
     }
 
     @Override
-    public synchronized boolean dispose() {
+    public boolean dispose() {
         if (!this.marked.compareAndSet(false, true)) {
             return false;
         }
@@ -64,6 +65,11 @@ public class CoreStrongEntryReference<T> implements EntryReference<T>, EntryRefe
     @Override
     public int hashCode() {
         return this.props.getHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toString(this.referentReference.get());
     }
 
     public CoreSimpleReferenceQueue<T> getQueue() {
