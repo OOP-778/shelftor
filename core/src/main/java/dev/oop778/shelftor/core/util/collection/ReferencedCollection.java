@@ -61,9 +61,9 @@ public class ReferencedCollection<T> implements Collection<T> {
     @Override
     public Iterator<T> iterator() {
         this.runRemoveInvalid();
-        return new ReferencedIterator<T, EntryReference<T>>(this.backing.iterator()) {
+        return new WrappedSmartIterator<EntryReference<T>, T>(this.backing.iterator()) {
             @Override
-            protected T extractKey(EntryReference<T> reference) {
+            protected T transform(EntryReference<T> reference) {
                 return reference.get();
             }
         };
@@ -174,5 +174,10 @@ public class ReferencedCollection<T> implements Collection<T> {
 
     public Collection<EntryReference<T>> getBacking() {
         return this.backing;
+    }
+
+    @Override
+    public String toString() {
+        return this.backing.toString();
     }
 }

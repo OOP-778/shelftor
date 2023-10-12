@@ -7,29 +7,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.jetbrains.annotations.NotNull;
 
 public class ListenableCollection<T> implements Collection<T> {
-    private Collection<T> backing;
+    protected Collection<T> backing;
     private final Collection<AddListener<T>> addListeners;
     private final Collection<RemoveListener<T>> removeListeners;
+    private final Collection<AccessListener<T>> accessListeners;
 
     public ListenableCollection(Collection<T> wrapping, boolean concurrent) {
         this.backing = wrapping;
 
         this.addListeners = concurrent ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
         this.removeListeners = concurrent ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
-    }
-
-    protected void setBacking(Collection<T> backing) {
-        this.backing = backing;
-    }
-
-    public Runnable onAdd(AddListener<T> listener) {
-        this.addListeners.add(listener);
-        return () -> this.addListeners.remove(listener);
-    }
-
-    public Runnable onRemove(RemoveListener<T> listener) {
-        this.removeListeners.add(listener);
-        return () -> this.removeListeners.remove(listener);
+        this.accessListeners = concurrent ? new ConcurrentLinkedQueue<>() : new ArrayList<>();
     }
 
     @Override
@@ -110,33 +98,23 @@ public class ListenableCollection<T> implements Collection<T> {
         this.backing.clear();
     }
 
-    public class ListenableIterator implements Iterator<T> {
-        private final Iterator<T> wrapping;
-        private T current;
+    protected void setBacking(Collection<T> backing) {
+        this.backing = backing;
+    }
 
-        public ListenableIterator(Iterator<T> wrapping) {
-            this.wrapping = wrapping;
-        }
+    public Runnable onAdd(AddListener<T> listener) {
+        this.addListeners.add(listener);
+        return () -> this.addListeners.remove(listener);
+    }
 
-        @Override
-        public boolean hasNext() {
-            return this.wrapping.hasNext();
-        }
+    public Runnable onRemove(RemoveListener<T> listener) {
+        this.removeListeners.add(listener);
+        return () -> this.removeListeners.remove(listener);
+    }
 
-        @Override
-        public T next() {
-            this.current = this.wrapping.next();
-            return this.current;
-        }
-
-        @Override
-        public void remove() {
-            if (this.current != null) {
-                ListenableCollection.this.removeListeners.forEach(listener -> listener.onRemove(this.current));
-            }
-
-            this.wrapping.remove();
-        }
+    public Runnable onAccess(AccessListener<T> listener) {
+        this.accessListeners.add(listener);
+        return () -> this.accessListeners.remove(listener);
     }
 
     @FunctionalInterface
@@ -147,5 +125,41 @@ public class ListenableCollection<T> implements Collection<T> {
     @FunctionalInterface
     public interface RemoveListener<T> {
         void onRemove(@NotNull T value);
+    }
+
+    @FunctionalInterface
+    public interface AccessListener<T> {
+        boolean onAccess(@NotNull T value);
+    }
+
+    public class ListenableIterator extends WrappedSmartIterator<T, T> {
+
+        public ListenableIterator(Iterator<T> wrapping) {
+            super(wrapping);
+        }
+
+        @Override
+        public void remove() {
+            if (this.current != null) {
+                ListenableCollection.this.removeListeners.forEach(listener -> listener.onRemove(this.current));
+            }
+
+            super.remove();
+        }
+
+        @Override
+        protected boolean validate(T value) {
+            return this.onAccess(value);
+        }
+
+        private boolean onAccess(T value) {
+            for (final AccessListener<T> accessListener : ListenableCollection.this.accessListeners) {
+                if (!accessListener.onAccess(value)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

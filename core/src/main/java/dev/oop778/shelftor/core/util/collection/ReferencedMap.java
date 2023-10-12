@@ -93,9 +93,9 @@ public class ReferencedMap<K, V> implements Map<K, V> {
         return new AbstractSet<K>() {
             @Override
             public java.util.Iterator<K> iterator() {
-                return new ReferencedIterator<K, EntryReference<K>>(ReferencedMap.this.map.keySet().iterator()) {
+                return new WrappedSmartIterator<EntryReference<K>, K>(ReferencedMap.this.map.keySet().iterator()) {
                     @Override
-                    public K extractKey(EntryReference<K> u) {
+                    public K transform(EntryReference<K> u) {
                         return u.get();
                     }
                 };
@@ -129,7 +129,7 @@ public class ReferencedMap<K, V> implements Map<K, V> {
                 return new ReferencedIterator<Entry<K, V>, Entry<EntryReference<K>, V>>(ReferencedMap.this.map.entrySet().iterator()) {
 
                     @Override
-                    public Entry<K, V> extractKey(Entry<EntryReference<K>, V> u) {
+                    public Entry<K, V> transform(Entry<EntryReference<K>, V> u) {
                         return new SimpleEntry<>(u.getKey().get(), u.getValue());
                     }
                 };
