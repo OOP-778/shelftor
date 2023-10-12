@@ -10,6 +10,7 @@ import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelfSettings;
 public class CoreExpiringShelfSettings<T> extends CoreShelfSettings implements ExpiringShelfSettings {
     private final Collection<ExpiringPolicy<T>> policies;
     private long checkInterval;
+    private boolean shouldAllPolicesMatch = true;
 
     public CoreExpiringShelfSettings(CoreShelfSettings settings) {
         super(settings);
@@ -32,5 +33,27 @@ public class CoreExpiringShelfSettings<T> extends CoreShelfSettings implements E
 
     public void addPolicy(ExpiringPolicy<T> policy) {
         this.policies.add(policy);
+    }
+
+    @Override
+    public boolean shouldAllPoliciesMatch() {
+        return this.shouldAllPolicesMatch;
+    }
+
+    public void setShouldAllPolicesMatch(boolean shouldAllPolicesMatch) {
+        this.shouldAllPolicesMatch = shouldAllPolicesMatch;
+    }
+
+    @Override
+    public void dump(Collection<String> lines) {
+        super.dump(lines);
+        lines.add("checkInterval = " + this.checkInterval);
+        if (!this.policies.isEmpty()) {
+            lines.add(" == Expiring Policies ==");
+            for (final ExpiringPolicy<T> policy : this.policies) {
+                lines.add(policy.toString());
+            }
+        }
+
     }
 }

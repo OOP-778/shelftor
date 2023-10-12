@@ -8,8 +8,10 @@ import dev.oop778.shelftor.core.expiring.ExpirationManager;
 import dev.oop778.shelftor.core.shelf.CoreShelf;
 import dev.oop778.shelftor.core.util.log.LogDebug;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import lombok.NonNull;
 
 public class CoreExpiringShelf<T> extends CoreShelf<T> implements ExpiringShelf<T> {
@@ -31,6 +33,34 @@ public class CoreExpiringShelf<T> extends CoreShelf<T> implements ExpiringShelf<
 
                 return ((ExpiringPolicyWithData<?, ?>) policy).shouldCallOnAccess();
             });
+
+        this.onAccess((value) -> {
+            final EntryReference<T> realReference = this.referenceManager.getRealReference(value);
+            if (realReference == null) {
+                return false;
+            }
+
+            return !this.tryExpire(realReference);
+        });
+    }
+
+    protected boolean tryExpire(EntryReference<T> reference) {
+        if (reference.isMarked()) {
+            return false;
+        }
+
+        if (this.expirationManager.shouldExpire(reference)) {
+            final T value = reference.get();
+            if (!this.referenceManager.releaseReference(reference)) {
+                return false;
+            }
+
+            LogDebug.log("Expired reference: %s", reference.get());
+            this.globalExpirationListeners.forEach((handler) -> handler.onExpire(value));
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -53,19 +83,14 @@ public class CoreExpiringShelf<T> extends CoreShelf<T> implements ExpiringShelf<
         return () -> this.globalExpirationListeners.remove(handler);
     }
 
-    protected boolean tryExpire(EntryReference<T> reference) {
-        if (reference.isMarked()) {
-            return false;
+    @Override
+    public Map<ExpiringPolicyWithData<T, ?>, Object> getExpirationData(T value) {
+        final EntryReference<T> realReference = this.referenceManager.getRealReference(value);
+        if (realReference == null || realReference.isMarked()) {
+            return new HashMap<>();
         }
 
-        if (this.expirationManager.shouldExpire(reference)) {
-            this.globalExpirationListeners.forEach((handler) -> handler.onExpire(reference.get()));
-
-            LogDebug.log("Expiring reference: " + reference.get());
-            return this.referenceManager.releaseReference(reference);
-        }
-
-        return false;
+        return this.expirationManager.getExpirationData(realReference);
     }
 
     @Override

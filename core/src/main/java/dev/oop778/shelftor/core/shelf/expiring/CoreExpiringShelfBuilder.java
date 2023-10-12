@@ -18,6 +18,12 @@ public class CoreExpiringShelfBuilder<T> extends CoreShelfBuilder<T, CoreExpirin
     }
 
     @Override
+    public CoreExpiringShelfBuilder<T> shouldAllPoliciesMatch(boolean shouldAllPoliciesMatch) {
+        this.getSettings().setShouldAllPolicesMatch(shouldAllPoliciesMatch);
+        return this;
+    }
+
+    @Override
     public CoreExpiringShelfBuilder<T> usePolicy(ExpiringPolicy<T> policy) {
         this.getSettings().addPolicy(policy);
         return this;

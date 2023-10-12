@@ -12,6 +12,8 @@ public interface ExpiringShelfBuilder<T, B extends ExpiringShelfBuilder<T, ?>> e
         return this.expireCheckInterval(unit.toMillis(interval));
     }
 
+    B shouldAllPoliciesMatch(boolean shouldAllPoliciesMatch);
+
     B usePolicy(ExpiringPolicy<T> policy);
 
     @Override

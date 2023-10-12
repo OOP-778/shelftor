@@ -7,5 +7,7 @@ import java.util.Collection;
 public interface ExpiringShelfSettings<T> extends ShelfSettings {
     long checkInterval();
 
+    boolean shouldAllPoliciesMatch();
+
     Collection<ExpiringPolicy<T>> expiringPolicies();
 }
