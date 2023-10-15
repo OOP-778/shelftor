@@ -3,8 +3,11 @@ package dev.oop778.shelftor.core.util.collection;
 import java.util.Iterator;
 
 /**
- * Didn't think of a name for this iterator but: 1. It does not ever allow nulls to be passed from iterator, hence first next value is gathered in hasNext, not
- * in next() 2. It allows for transforming values IN -> OUT 2. It allows filtering for any overriding class
+ * Didn't think of a name for this iterator but:
+ * 1. It does not ever allow nulls to be passed from iterator, hence first next value is gathered in hasNext, not
+ * in next()
+ * 2. It allows for transforming values IN to OUT
+ * 3. It allows filtering for any overriding class
  */
 public class WrappedSmartIterator<IN, OUT> implements Iterator<OUT> {
     protected final Iterator<IN> iterator;

@@ -6,6 +6,8 @@ import dev.oop778.shelftor.api.reference.ReferenceManager;
 import dev.oop778.shelftor.core.shelf.CoreShelfSettings;
 import dev.oop778.shelftor.core.util.collection.Collections;
 import dev.oop778.shelftor.core.util.collection.ReferencedCollection;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class IndexedReferences<K, V> {
     private final K key;
@@ -19,6 +21,15 @@ public class IndexedReferences<K, V> {
     }
 
     private ReferencedCollection<V> createCollection(CoreShelfSettings storeSettings, ReferenceManager<V> referenceManager) {
+        // need to keep order
+        if (this.definition.getReducer() != null) {
+            if (storeSettings.isConcurrent()) {
+                return new ReferencedCollection<>(new ConcurrentLinkedDeque<>(), referenceManager);
+            }
+
+            return new ReferencedCollection<>(new ArrayList<>(), referenceManager);
+        }
+
         return Collections.createReferencedCollection(
             storeSettings,
             referenceManager
@@ -31,15 +42,19 @@ public class IndexedReferences<K, V> {
             return false;
         }
 
+        //System.out.println(String.format("PRE REDUCE: %s", this.collection));
+
         if (this.definition.getReducer() != null) {
             this.definition.getReducer().reduce(this.key, this.collection);
         }
+
+        //System.out.println(String.format("POST REDUCE: %s", this.collection));
 
         return this.collection.contains(reference.get());
     }
 
     public void remove(EntryReference<V> reference) {
-        this.collection.addReference(reference);
+        this.collection.removeReference(reference);
     }
 
     public ReferencedCollection<V> getCollection() {
